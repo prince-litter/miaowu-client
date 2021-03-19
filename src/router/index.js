@@ -11,9 +11,12 @@ import MedicShop from '../pages/MedicShop/MedicShop'
 import AdoptionShopBlog from "../pages/AdoptionShopBlog/AdoptionShopBlog"
 import AdoptionBlogMessage from "../pages/AdoptionBlogMessage/AdoptionBlogMessage"
 import ProfilePublish from "../pages/ProfilePublish/ProfilePublish"
+import Register from "../pages/Register/Register"
+import Message from "../pages/Message/Message"
 Vue.use(Router);
 
 export default new Router({
+  mode:'history',
   routes: [
 
     {
@@ -34,9 +37,16 @@ export default new Router({
         showFooter:true
       }
     },
+    // {
+    //   path:'/adoption',
+    //   component:Adoption,
+    //   meta:{
+    //     showFooter:true
+    //   }
+    // },
     {
-      path:'/adoption',
-      component:Adoption,
+      path:'/message',
+      component:Message,
       meta:{
         showFooter:true
       }
@@ -55,6 +65,10 @@ export default new Router({
     {
       path:'/login',
       component:Login
+    },
+    {
+      path:'/register',
+      component:Register
     },
     {
       path:'/adoption_shop',

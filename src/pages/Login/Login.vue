@@ -11,19 +11,20 @@
       <div class="login_content">
         <div class="content_top">
           <span>账号</span><br>
-          <input type="text" placeholder="请输入手机号">
+          <input type="text" v-model="userName" placeholder="请输入账号">
         </div>
         <div class="divide_line"></div>
         <div class="content_bottom">
           <span>密码</span>
-          <i class="iconfont icon-yanjing_xianshi_o"></i><br>
-          <input type="password" placeholder="请输入密码">
+          <i class="iconfont icon-yanjing_xianshi_o" @click="eye" ></i><br>
+          <input type="password" v-model="userPwd" placeholder="请输入密码" v-show="isEye">
+          <input type="text" v-model="userPwd" placeholder="请输入密码" v-show="!isEye">
 
         </div>
       </div>
       <div class="login_type">
-        <div class="type right">登录</div>
-        <div class="type left">注册</div>
+        <div class="type right" @click="login">登录</div>
+        <div class="type left" @click="register">注册</div>
       </div>
 <!--      <div class="login_footer">-->
 <!--        <div class="footer_divide">-->
@@ -41,8 +42,50 @@
   </section>
 </template>
 <script>
-  export default {
+  import axios from  'axios'
 
+  import Toast from 'vant/lib/toast';
+  import 'vant/lib/toast/style';
+  export default {
+    data(){
+      return{
+        userName:'',
+        userPwd:'',
+        errorTip:false,
+        isEye:true
+      }
+    },
+    methods:{
+      register(){
+        this.$router.push('/register')
+      },
+      eye(){
+        this.isEye = !this.isEye
+      },
+      showToast(msg){
+        Toast(msg)
+      },
+      login(){
+        if(!this.userName || !this.userPwd){
+          this.showToast('用户名或密码不能为空')
+          return
+        }
+        axios.post('/users/login',{
+          userName:this.userName,
+          userPwd:this.userPwd
+        }).then((response) =>{
+          let res = response.data
+          console.log(res)
+          if(res.status == '200'){
+            console.log('成功')
+            this.$router.replace({path:'profile',query:{userName:res.result.userName}})
+          }else {
+            console.log('失败')
+            this.showToast('用户名或密码错误')
+          }
+        })
+      }
+    }
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -82,6 +125,8 @@
           top 20px
           left 20px
           input
+            position relative
+            z-index 999
             margin-top 22px
             background-color transparent
             outline none

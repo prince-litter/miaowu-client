@@ -80,7 +80,9 @@
     margin-top 30px
     margin-left 30px
     width 100%
+    height 100%
     .profile_list
+      height 100%
       .profile_li
         width 100%
         height 150px

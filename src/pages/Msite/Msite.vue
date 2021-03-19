@@ -6,7 +6,7 @@
         <i class="iconfont icon-List-1 "></i>
       </a>
       <a class="header_search">
-        <input type="text">
+        <input type="text" v-model="search">
         <i class="iconfont icon-search "></i>
       </a>
       <a class="header_add">
@@ -14,7 +14,7 @@
       </a>
     </header>
 <!--    首页导航-->
-    <div class="wrapper" ref="wrapper">
+    <Scroll class="miste-wrapper">
       <div>
         <nav class="msite_nav">
           <div class="swiper-container">
@@ -46,61 +46,62 @@
           </div>
         </nav>
         <div class="pet_list">
-          <div class="pet_header">
-            <ul class="nav-lists">
-              <li class="nav-list">
-                <a href="javascript:">
-                  <span>推荐</span>
-                </a>
-              </li>
-              <li class="nav-list on">
-                <a href="javascript:">
-                  <span class="active">同城</span>
-                </a>
-              </li>
-              <li class="nav-list">
-                <a href="javascript:">
-                  <span>话题</span>
-                </a>
-              </li>
-              <li class="nav-list">
-                <a href="javascript:">
-                  <span>猫小组</span>
-                </a>
-              </li>
-            </ul>
+          <div class="adoption_header">
+            <span>Adopt animals</span>
+            <p>做他们一生的家人</p>
           </div>
+<!--          <div class="pet_header">-->
+<!--            <ul class="nav-lists">-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>推荐</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list on">-->
+<!--                <a href="javascript:">-->
+<!--                  <span class="active">同城</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>话题</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>猫小组</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </div>-->
 
-          <pet-list/>
+          <AdoptionList/>
         </div>
       </div>
-    </div>
+    </Scroll>
   </div>
 </template>
 <script>
-  import PetList from '../../components/PetList/PetList'
+  import AdoptionList from '../../components/AdoptionList/AdoptionList'
+  import Scroll from '../../components/Scroll/Scroll'
   import Swiper from 'swiper'
-  import BScroll from 'better-scroll'
+  // import BScroll from 'better-scroll'
   import 'swiper/swiper-bundle.min.css'
   export default {
-
+   data(){
+     return{
+       search:''
+     }
+   },
     mounted() {
-
-        // this.$nextTick(() => {
-        //   this.scroll = new BScroll('.wrapper', {
-        //     scrollY: true,
-        //     click: true,
-        //    // movable:true
-        //
-        //   })
-        // });
-
-      new Swiper('.swiper-container',{
-        loop:true
-      })
+       new Swiper ('.swiper-container', {
+         loop: true, // 循环模式选项
+         autoplay:true
+       })
     },
     components:{
-      PetList
+      AdoptionList,
+      Scroll
     }
   }
 </script>
@@ -138,6 +139,7 @@
           width 227px
           height 30px
           border-radius 15px
+          padding-left 15px
         .icon-search
           font-size 18px
           position absolute
@@ -152,10 +154,10 @@
         .icon-add
           font-size 20px
           color #7D7D7D
-    .wrapper
-      width 100%
+    .miste-wrapper
+      margin-top 55px
       .msite_nav
-        margin-top 75px
+        padding-top 20px
         height 159px
         .swiper-container
           width 100%
@@ -173,23 +175,41 @@
       .pet_list
         width 100%
         margin-top 30px
-        .pet_header
-          padding 0px 20px 0
-          width 100%
-          .nav-list
-            display inline-block
-            padding 0 10px
-            margin-left -10px
-            text-align center
-            &.on
-              background url("./images/rectangle-list.png") no-repeat center bottom
-            span
-              width 100%
-              font-size 18px
-              font-family  "Arial"
-              font-weight bold
-              color #AAAAAA
-              &.active
-               color #7F7F7F
+        .adoption_header
+          margin-left 21px
+          margin-bottom 20px
+          span
+            font-size 22.5px
+            font-family "Arial"
+            font-weight bold
+            color #A5D2FF
+          p
+            font-size 12.5px
+            color #FF8AA2
+            font-family "Arial"
+            margin-top 10px
+            font-weight bold
 
+ /*
+
+  .pet_header
+    padding 0px 20px 0
+    width 100%
+    .nav-list
+      display inline-block
+      padding 0 10px
+      margin-left -10px
+      text-align center
+      &.on
+        background url("./images/rectangle-list.png") no-repeat center bottom
+      span
+        width 100%
+        font-size 18px
+        font-family  "Arial"
+        font-weight bold
+        color #AAAAAA
+        &.active
+          color #7F7F7F
+
+ */
 </style>

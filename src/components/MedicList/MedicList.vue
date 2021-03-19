@@ -2,50 +2,19 @@
   <div class="shop_container">
 
     <ul class="shop_lists">
-      <li class="shop_list" @touchstart="$router.push('/medic_shop')">
+      <li class="shop_list" v-for="item in storeList"
+          @click="$router.push({path:'/medic_shop',query:{storeInfo:item.storeInfo,storeName:item.storeName,storeAddress:item.storeAddress}})">
         <div class="shop_left">
-          <img src="./images/head1.jpg" class="shop_img" alt="">
+          <van-image  width="80"  lazy-load :src="'http://localhost:3000\\'+ item.storeImage"/>
         </div>
-        <a href="javascript:">
+        <a href="javascript:;">
           <div class="shop_right">
             <a class="shop_title">
-              <h2>Healthy life</h2>
+              <h2>{{item.storeName}}</h2>
             </a>
             <a class="shop_position">
               <i class="iconfont icon-position "></i>
-              <span>北京市苏庄东街南口拐角处</span>
-            </a>
-          </div>
-        </a>
-      </li>
-      <li class="shop_list" @touchstart="$router.push('./medic_shop')">
-        <div class="shop_left">
-          <img src="./images/head3.jpg" class="shop_img" alt="">
-        </div>
-        <a href="javascript:">
-          <div class="shop_right">
-            <a class="shop_title">
-              <h2>Healthy life</h2>
-            </a>
-            <a class="shop_position">
-              <i class="iconfont icon-position "></i>
-              <span>北京市苏庄东街南口拐角处</span>
-            </a>
-          </div>
-        </a>
-      </li>
-      <li class="shop_list" @touchstart="$router.push('./medic_shop')">
-        <div class="shop_left">
-          <img src="./images/head1.jpg" class="shop_img" alt="">
-        </div>
-        <a href="javascript:">
-          <div class="shop_right">
-            <a class="shop_title">
-              <h2>Healthy life</h2>
-            </a>
-            <a class="shop_position">
-              <i class="iconfont icon-position "></i>
-              <span>北京市苏庄东街南口拐角处</span>
+              <span>{{item.storeAddress}}</span>
             </a>
           </div>
         </a>
@@ -54,7 +23,32 @@
   </div>
 </template>
 <script>
-  export default {}
+  import Vue from 'vue';
+  import { Image as VanImage } from 'vant';
+  import { Lazyload } from 'vant';
+
+  Vue.use(Lazyload);
+  Vue.use(VanImage);
+  import axios from 'axios'
+  export default {
+    data (){
+      return{
+        storeList:[]
+      }
+    },
+    mounted() {
+      axios.get("/medic").then((response) => {
+        let res = response.data;
+        if(res.status === "200"){
+          this.storeList = res.result.list
+        }else {
+          console.log('获取数据失败')
+
+        }
+      })
+    }
+  }
+
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
   .shop_container

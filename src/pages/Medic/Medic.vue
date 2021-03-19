@@ -14,44 +14,55 @@
       </a>
 
     </header>
-    <div class="medic_content">
-      <div class="medic_nav">
-        <ul class="nav_lists">
-          <div class="medic_active on"></div>
-          <li class="nav_list">
-            <a href="javascript:">
-              <span class="active">最近</span>
-            </a>
-          </li>
-          <div class="medic_active"></div>
-          <li class="nav_list">
+    <Scroll class="medic-wrapper">
+      <div class="content-container">
+        <div class="medic_content">
+          <div class="medic_nav">
+            <ul class="nav_lists">
+              <div class="medic_active on"></div>
+              <li class="nav_list">
+                <a href="javascript:">
+                  <span class="active">最近</span>
+                </a>
+              </li>
+              <div class="medic_active"></div>
+              <li class="nav_list">
 
-            <a href="javascript:">
-              <span>好评</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div class="medic_banner">
-        <div id="medic_wrap">
-          <div class="medic_carousel-wrap">
-
+                <a href="javascript:">
+                  <span>好评</span>
+                </a>
+              </li>
+            </ul>
           </div>
+          <div class="medic_banner">
+            <div id="medic_wrap">
+              <div class="medic_carousel-wrap">
 
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="medic_shop_list">
+          <div class="shop_header">
+            <span>宠物医院</span>
+          </div>
+          <MedicList/>
         </div>
       </div>
-    </div>
-    <div class="medic_shop_list">
-      <div class="shop_header">
-        <span>宠物医院</span>
-      </div>
-      <MedicList/>
-    </div>
+    </Scroll>
   </div>
 </template>
 <script>
 import MedicList from '../../components/MedicList/MedicList'
+import Scroll from '../../components/Scroll/Scroll'
+
   export default {
+    data(){
+      return{
+
+      }
+    },
     mounted() {
 
       document.addEventListener("touchstart", function (ev) {
@@ -131,7 +142,8 @@ import MedicList from '../../components/MedicList/MedicList'
 
     },
     components:{
-        MedicList
+        MedicList,
+        Scroll
     }
   }
 
@@ -177,73 +189,78 @@ import MedicList from '../../components/MedicList/MedicList'
         .icon-search
           font-size 20px
           color #7D7D7D
-    .medic_content
-      width 100%
-      margin-top 80px
-      display flex
-      .medic_nav
-        margin-left 20px
-        .nav_lists
-          width 37px
-          .nav_list
-            width 15px
-            margin-left 5px
-            display inline-block
-            vertical-align top
-            padding-top 4px
+    .medic-wrapper
+      margin-top 55px!important
+      .content-container
+        padding-top 20px
+        padding-bottom 10px
+        .medic_content
+          width 100%
+          display flex
+          .medic_nav
+            margin-left 20px
+            .nav_lists
+              width 37px
+              .nav_list
+                width 15px
+                margin-left 5px
+                display inline-block
+                vertical-align top
+                padding-top 4px
+                margin-bottom 20px
+                span
+                  font-size 15px
+                  font-family "Arial"
+                  font-weight bold
+                  &.active
+                    color #555555
+              .medic_active
+                width 7px
+                height 38px
+                display inline-block
+                &.on
+                  background-color #FEB8C0
+          .medic_banner
+            margin-left 20px
+            width 100%
+
+            #medic_wrap
+              height 350px
+              overflow hidden
+              .medic_carousel-wrap
+                margin-top 10px
+                position relative
+                .medic_list
+                  list-style none
+                  overflow hidden
+                  position absolute
+                  width 609px
+                  left 0px
+                  li
+                    float left
+                    width 183px
+                    margin 0 10px
+                    a
+                      display block
+                      margin 0 auto
+                      width 183px
+                      img
+                        width 183px
+                        border-radius 15px
+
+
+
+        .medic_shop_list
+          width 100%
+          height 100%
+          margin-top 20px
+          .shop_header
+            margin-left 20px
             margin-bottom 20px
             span
-              font-size 15px
+              font-size 20px
               font-family "Arial"
               font-weight bold
-              &.active
-                color #555555
-          .medic_active
-            width 7px
-            height 38px
-            display inline-block
-            &.on
-              background-color #FEB8C0
-      .medic_banner
-        margin-left 20px
-        width 100%
-
-        #medic_wrap
-          height 350px
-          overflow hidden
-          .medic_carousel-wrap
-            margin-top 10px
-            position relative
-            .medic_list
-              list-style none
-              overflow hidden
-              position absolute
-              width 609px
-              left 0px
-              li
-                float left
-                width 183px
-                margin 0 10px
-                a
-                  display block
-                  margin 0 auto
-                  width 183px
-                  img
-                    width 183px
-                    border-radius 15px
-
-
-
-    .medic_shop_list
-      width 100%
-      margin-top 20px
-      .shop_header
-        margin-left 20px
-        margin-bottom 20px
-        span
-          font-size 20px
-          font-family "Arial"
-          font-weight bold
-          color #AAAAAA
+              color #AAAAAA
 
 </style>

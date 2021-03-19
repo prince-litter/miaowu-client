@@ -12,7 +12,7 @@
                 <li class="adoption_focus"><img src="./images/focus.png" alt=""></li>
               </ul>
             </section>
-            <section class="adoption_shop_pet_content" @touchstart="$router.push('/adoption_shop')">
+            <section class="adoption_shop_pet_content" @click="goDetail">
               <p class="adoption_pet_msg">小猫咪，母猫乳白色，具体品种未知，但是挺好看。一窝生了十只崽崽，养不起...</p>
               <img class="adoption_pet_img" src="./images/active-img1.jpg" alt="">
               <ul>
@@ -45,7 +45,7 @@
                 <li class="adoption_focus"><img src="./images/focus.png" alt=""></li>
               </ul>
             </section>
-            <section class="adoption_shop_pet_content" @touchstart="$router.push('/adoption_shop')">
+            <section class="adoption_shop_pet_content" @click="goDetail">
               <p class="adoption_pet_msg">小猫咪，母猫乳白色，具体品种未知，但是挺好看。一窝生了十只崽崽，养不起...</p>
               <img class="adoption_pet_img" src="./images/active-img1.jpg" alt="">
               <ul>
@@ -71,12 +71,24 @@
   </div>
 </template>
 <script>
-  export default {}
+  export default {
+    data(){
+      return{
+
+      }
+    },
+    methods:{
+      goDetail(){
+        this.$router.push('/adoption_shop')
+      }
+    }
+  }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
   .adoption_shop_container
     margin-top 10px
     .adoption_shop_list
+      margin-bottom 20px
       .adoption_shop_li
         width 100%
         .adoption_shop_box
