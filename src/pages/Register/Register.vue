@@ -80,7 +80,7 @@
             console.log('注册成功')
             this.showToast('注册成功,即将前往登录页面')
             setTimeout( () =>{
-              this.$router.replace('/login')
+              this.$router.replace({path:'/login',query:{userName:this.userName}})
             },2000)
           }else {
             console.log('注册失败')

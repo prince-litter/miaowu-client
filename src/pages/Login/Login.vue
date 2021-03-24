@@ -55,6 +55,11 @@
         isEye:true
       }
     },
+    mounted(){
+      if( this.$route.query.userName){
+        this.userName =  this.$route.query.userName
+      }
+    },
     methods:{
       register(){
         this.$router.push('/register')
@@ -78,10 +83,16 @@
           console.log(res)
           if(res.status == '200'){
             console.log('成功')
-            this.$router.replace({path:'profile',query:{userName:res.result.userName}})
+            this.$router.replace('/msite')
+            //保存token到本地
+            localStorage.setItem('token',res.result.token)
+            localStorage.setItem('userId',res.result.id)
+            localStorage.setItem('userName',res.result.userName)
+            localStorage.setItem('imgUrl',res.result.imgUrl)
           }else {
             console.log('失败')
             this.showToast('用户名或密码错误')
+            this.userPwd = ''
           }
         })
       }

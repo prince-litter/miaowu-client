@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-search v-model="value" placeholder="请输入搜索关键词"></van-search>
+    <van-search input-align="center" readonly placeholder="搜索" @click="toSearch"></van-search>
     <Scroll :data="friends">
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <div class="message-wrapper">
@@ -38,7 +38,6 @@ Vue.use(PullRefresh);
   export default {
     data() {
       return {
-        value: '',
         friends:[],
         pulldown: true,
         isLoading: false,
@@ -52,6 +51,9 @@ Vue.use(PullRefresh);
       console.log(this.friends)
     },
     methods:{
+      toSearch (){
+        this.$router.push('/search')
+      },
       onRefresh() {
         setTimeout(() => {
           Toast('刷新成功');

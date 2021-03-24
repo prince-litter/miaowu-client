@@ -14,7 +14,7 @@ export default {
         id:2,
         imgUrl:'head-1.jpg',
         tip:12,
-        name:'乖乖',
+        name:'乖乖哈哈嘻嘻',
         time:new Date(),
         news:'君不见上来，倒海不复回君不见，哈行啊和'
       },
@@ -22,7 +22,7 @@ export default {
         id: 3,
         imgUrl: 'head-2.jpg',
         tip: 3,
-        name: '憨憨',
+        name: '憨憨真可爱',
         time: new Date(),
         news: '君不见黄河之水天上来，倒海不复可可'
       },
@@ -30,7 +30,7 @@ export default {
         id:4,
         imgUrl:'head-3.jpg',
         tip:0,
-        name:'肉肉',
+        name:'肉肉看不见',
         time:new Date(),
         news:'君不见黄河之水天上来，倒海不复回君不见，哈行啊和'
       },
@@ -38,7 +38,7 @@ export default {
         id:5,
         imgUrl:'head-me.jpg',
         tip:222,
-        name:'大海',
+        name:'大海我的故乡',
         time:new Date(),
         news:'倒海不复回君不见，哈行啊和'
       },
@@ -78,7 +78,7 @@ export default {
         id:10,
         imgUrl:'head-3.jpg',
         tip:222,
-        name:'大海',
+        name:'x大海东流去',
         time:new Date(),
         news:'倒海不复回君不见，哈行啊和'
       },
@@ -86,7 +86,7 @@ export default {
         id: 11,
         imgUrl: 'head-1.jpg',
         tip: 3,
-        name: '憨憨可',
+        name: '憨憨可哈怪',
         time: new Date(),
         news: '君不见黄河之水天上来，倒海不复可可'
       },
@@ -104,6 +104,52 @@ export default {
   //聊天消息
   message:function () {
     let msgs = [
+      {
+        id:'b', //用户id
+        imgUrl:'head-2.jpg',
+        message:{
+          address:'东长安街天安门城楼内东长安街天安门城楼内',
+          latitude:39.909473,
+          longitude:116.39730899999999
+        },
+        types:3,                //内容类型（0文字，1图片连接，2音频连接）
+        time: new Date(),  //发送时间
+        tip:11
+      },
+      {
+        id:'a', //用户id
+        imgUrl:'head-1.jpg',
+        message:{
+          address:'四川省成都市都江堰市青城山镇成都东软件学院信息技术应用研究中心成都东软学院',
+          latitude:30.889577,
+          longitude:103.595209
+        },
+        types:3,                //内容类型（0文字，1图片连接，2音频连接）
+        time: new Date(),  //发送时间
+        tip:12
+      },
+      {
+        id:'a', //用户id
+        imgUrl:'head-1.jpg',
+        message:{
+          voice:'a',
+          time:60
+        },
+        types:2,                //内容类型（0文字，1图片连接，2音频连接）
+        time: new Date(),  //发送时间
+        tip:9
+      },
+      {
+        id:'b', //用户id
+        imgUrl:'head-2.jpg',
+        message:{
+          voice:'a',
+          time:20
+        },
+        types:2,                //内容类型（0文字，1图片连接，2音频连接）
+        time: new Date(),  //发送时间
+        tip:10
+      },
       {
         id:'a', //用户id
         imgUrl:'head-1.jpg',
@@ -178,6 +224,29 @@ export default {
       },
     ]
     return msgs
+  },
+
+  //好友关系
+  isfriend:function () {
+    let isfriend = [
+      {
+        userid:1,
+        friend:2,
+      },
+      {
+        userid:1,
+        friend:3,
+      },
+      {
+        userid:1,
+        friend:5,
+      },
+      {
+        userid:1,
+        friend:8,
+      },
+    ]
+    return isfriend
   }
 }
 

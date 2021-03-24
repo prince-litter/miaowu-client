@@ -18,14 +18,52 @@
               <div class="message" v-if="item.types === 1">
                 <img :src="item.message" class="msg-img"  @click="imagePreview(item.message)"  alt="">
               </div>
+              <div class="message" v-if="item.types === 2" >
+                <div class="msg-text voice"
+                     :style="{width:item.message.time * 4 + 'px'}"
+                     @click="playVoice(item.message.voice)"
+                >
+                  <img src="./images/yy.png" class="voice-img" alt="">
+                  {{item.message.time}}"
+                </div>
+              </div>
+              <div class="message" v-if="item.types === 3">
+                <div class="msg-map">
+                  <div class="map-name">{{item.message.address}}</div>
+                  <div class="map-address">{{item.message.address}}</div>
+                  <div class="map" :id="item.tip"></div>
+                </div>
+
+              </div>
             </div>
               <div class="msg-m msg-right" v-if="item.id == 'b'">
                 <img class="user-img" :src="item.imgUrl" alt="">
+                <!-- 文字-->
                 <div class="message" v-if="item.types === 0">
                   <div class="msg-text">{{item.message}}</div>
                 </div>
+                 <!-- 图片-->
                 <div class="message" v-if="item.types === 1">
                   <img :src="item.message" class="msg-img" @click="imagePreview(item.message)" alt="">
+                </div>
+                <!-- 音频-->
+                <div class="message" v-if="item.types === 2">
+                  <div class="msg-text voice"
+                       :style="{width:item.message.time * 4 + 'px'}"
+                       @click="playVoice(item.message.voice)"
+                  >
+                    {{item.message.time}}"
+                    <img src="./images/yy.png" class="voice-img" alt="">
+                  </div>
+                </div>
+                <!-- 位置-->
+                <div class="message" v-if="item.types === 3">
+                  <div class="msg-map">
+                    <div class="map-name">{{item.message.address}}</div>
+                    <div class="map-address">{{item.message.address}}</div>
+                    <div class="map" :id="item.tip"></div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -41,7 +79,7 @@
 
           </div>
       </Scroll>
-      <Submit @inputs = "inputs" @heights="heights"/>
+      <Submit ref="submit" @inputs = "inputs" @heights="heights"/>
 
   </div>
 
@@ -51,7 +89,6 @@
   import Submit from '../../components/Submit/Submit'
   import datas from '../../common/js/datas'
   import myfun from '../../common/js/myfun'
-
   import Vue from 'vue';
   import { ImagePreview } from 'vant';
 
@@ -63,7 +100,9 @@
         msgs:[],
         imgMsg:[],
         oldTime:new Date(),
-        inputh:'54px'
+        inputh:'54px',
+        isPlay:false,
+        nowpage:0 //页数
       }
     },
     components:{
@@ -72,9 +111,37 @@
     },
     mounted(){
       this.getMsg()
+      setTimeout(() => {
+        this.getmap()
+      },50)
+
 
     },
     methods:{
+      //创建地图
+      getmap () {
+        let info = this.msgs
+        info.forEach(item =>{
+          if(item.types === 3){
+            let lat = item.message.latitude
+            let lon = item.message.longitude
+            // console.log(typeof lat)
+            let map = new AMap.Map(`${item.tip}`, {
+              center:[lon, lat],
+              zoom:14
+            });
+            // 创建一个 Marker 实例：
+            let marker = new AMap.Marker({
+              position: new AMap.LngLat(lon, lat),   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+            });
+
+            // 将创建的点标记添加到已有的地图实例：
+            map.add(marker);
+          }
+        })
+
+      },
+      //预览图片
       imagePreview(currentImg){
         let current = null
         this.imgMsg.forEach((item,index) => {
@@ -83,6 +150,20 @@
           }
         })
         ImagePreview({images:this.imgMsg,startPosition:current,closeable: true, });
+      },
+      //音频播放
+      playVoice(e){
+        // this.isPlay = !this.isPlay
+        console.log( this.isPlay)
+        this.audio = new Audio()
+        this.audio.src = e
+        this.audio.play()
+        // if(this.isPlay){
+        //   this.audio.play()
+        // }
+
+
+
       },
       //获取消息
       getMsg() {
@@ -113,18 +194,33 @@
       //接收输入内容
       inputs(e){
         let len = this.msgs.length
+        //处理时间间隔
+        let nowTime = new Date();
+        let t = myfun.spaceTime(this.oldTime,nowTime)
+        if(t){
+          this.oldTime = t
+        }
+        nowTime = t
         let data = {
           id:'b', //用户id
           imgUrl:'../../../static/images/head-2.jpg',
           message:e.message,
           types:e.types,                //内容类型（0文字，1图片连接，2音频连接）
-          time: new Date(),  //发送时间
+          time: nowTime,  //发送时间
           tip:len
         }
         this.msgs.push(data)
-        this.$nextTick(() => {
-          this.$refs.scroll.ScrollToEndFlag();
-        })
+        setTimeout(() => {
+          this.$nextTick(() => {
+            this.getmap()
+            this.$refs.scroll.ScrollToEndFlag()
+            this.$refs.submit.getElementHeight()
+          })
+        },50)
+        if(e.types === 1 ){
+          this.imgMsg.push(e.message)
+        }
+
         console.log(e)
       },
       //输入框的高度
@@ -136,6 +232,7 @@
 
 
       },
+
 
     }
   }
@@ -208,6 +305,37 @@
               .msg-img
                 max-width 200px
                 border-radius 10px
+              .voice
+                min-width 45px
+                max-width 200px
+                .voice-img
+                   width 18px
+              .msg-map
+                background-color #fff
+                width 230px
+                height 142px
+                overflow hidden
+                .map-name
+                  font-size 16px
+                  line-height 22px
+                  padding 9px 12px 0 12px
+                  display -webkit-box
+                  -webkit-box-orient vertical
+                  -webkit-line-clamp 1
+                  overflow hidden
+                .map-address
+                  display -webkit-box
+                  -webkit-box-orient vertical
+                  -webkit-line-clamp 1
+                  overflow hidden
+                  color rgba(39,40,50,0.4)
+                  font-size 12px
+                  padding 0 12px
+                .map
+                  margin-top 4px
+                  width 230px
+                  height 95px
+
           .msg-left
             flex-direction row
             .msg-text
@@ -216,6 +344,14 @@
               border-radius 0 10px 10px 10px
             .msg-img
               margin-left 8px
+            .msg-map
+              margin-left 8px
+              border-radius 0 10px 10px 10px
+            .voice
+              text-align right
+              .voice-img
+                float left
+                padding-top 2px
           .msg-right
             flex-direction row-reverse
             .msg-text
@@ -224,6 +360,14 @@
               background-color #A5D2FF
             .msg-img
               margin-right 8px
-
+            .msg-map
+              margin-right 8px
+              border-radius 10px 0 10px 10px
+            .voice
+              text-align left
+              .voice-img
+                float right
+                transform rotate(180deg)
+                padding-bottom 2px
 
 </style>

@@ -6,7 +6,7 @@
           <div class="head_bg"></div>
           <div class="head_bg1"></div>
           <a href="javascript:;" class="head_box">
-            <img src="./images/head-me.jpg" alt="">
+            <img :src="this.imgUrl" alt="">
             <p class="head_name" v-show="!userName" @click="toLogin">登录/注册</p>
             <p class="head_name" v-show="userName">{{userName}}</p>
             <p class="head_address" v-show="userName" @click="logout">退出登录</p>
@@ -52,21 +52,33 @@
   export default {
     data(){
       return{
-        userName:''
+        userName:'',
+        imgUrl:'http://localhost:3000/public/images/user/head-me.jpg'
       }
     },
     mounted(){
       // this.userName = this.$route.query.userName
+      // console.log(localStorage.getItem('token'))
       this.loginCheck()
     },
     methods:{
       loginCheck(){
-        axios.get('/users/checkLogin').then((response) => {
-          var res = response.data
-          if(res.status == '200'){
-            this.userName = res.result
-          }
-        })
+        let imgUrl = localStorage.getItem('imgUrl')
+        let token = localStorage.getItem('token')
+        let userName = localStorage.getItem('userName')
+        if(token){
+          this.imgUrl = "http://localhost:3000/public/images/user/" + imgUrl
+          this.userName = userName
+        }
+
+        // axios.get('/users/checkLogin').then((response) => {
+        //   var res = response.data
+        //   if(res.status == '200'){
+        //     this.userName = res.result
+        //
+        //     // console.log(this.imgUrl)
+        //   }
+        // })
       },
       toLogin(){
         this.$router.push('/login')
@@ -81,6 +93,7 @@
               var res = response.data
               if(res.status == '200'){
                 this.userName=''
+                this.imgUrl = 'http://localhost:3000/public/images/user/head-me.jpg'
               }
             })
           })
@@ -126,6 +139,8 @@
             text-align center
             img
               border-radius 50%
+              width 67px
+              height 67px
             .head_name,.head_address
               color white
               font-family "Arial"

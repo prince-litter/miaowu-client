@@ -16,8 +16,16 @@
            :border="false"
            :class="{displaynone:isrecord}"
          ></van-field>
-         <van-field class="record btn" :class="{displaynone:!isrecord}" :center="true" :border="false" value="按住说话" readonly>
-         </van-field>
+         <van-field class="record btn"
+                    @touchstart.prevent="handleStart"
+                    @touchend.prevent = "handleEnd"
+                    @touchmove.prevent = "handleMove"
+                    :class="{displaynone:!isrecord}"
+                    :center="true"
+                    :border="false"
+                    value="按住说话"
+                    readonly
+         ></van-field>
          <div class="bt-img" @click="emoji">
            <img src="./images/emotion.png" alt="">
          </div>
@@ -40,11 +48,12 @@
             <img src="./images/photoes.png" alt="">
             <div class="more-list-title">图片</div>
           </div>
-         <div class="more-list">
+         <div class="more-list" @click="showCamera">
+           <input ref="camera" class="hide_file" type="file" accept="image/*;" capture="camera" @change="getCamera($event)"/>
            <img src="./images/camera.png" alt="">
            <div class="more-list-title">拍照</div>
          </div>
-         <div class="more-list">
+         <div class="more-list" @click="getLocation">
            <img class="po" src="./images/position.png" alt="">
            <div class="more-list-title">定位</div>
          </div>
@@ -60,13 +69,25 @@
 
 
      </div>
+     <div class="voice-bg" v-show="voicebg">
+       <div class="voice-bg-len">
+         <div class="voice-bg-time" :style="{width:vlength/0.6+'%'}">{{vlength}}〞</div>
+       </div>
+       <div class="voice-del">上划取消录音</div>
+     </div>
+     <Map v-show="isGps" ref="gps" :isGps="isGps" @position="position" @addr="addr"/>
   </div>
 </template>
 <script>
   import Vue from 'vue';
-  import { Field } from 'vant';
-  import  Emoji from './emoji/emoji'
+  import { Field,Toast } from 'vant';
+  import  Emoji from './emoji/emoji';
+  import  Map from '../../components/Map/Map';
+  import Recorder from 'js-audio-recorder';
+  import axios from 'axios'
 
+
+  let recorder = new Recorder();
   Vue.use(Field);
   export default {
     data(){
@@ -75,21 +96,68 @@
           isrecord:false,
           toc:"../../../static/images/voice.png",
           isemoji:false,
-          ismore:false
+          ismore:false,
+          timer:'',//计时器
+          vlength:0,//音频时长
+          voicebg:false,
+          pageY:'',
+          isGps:false,
+          address:'',
+          id:'abcdfeg'
+
       }
     },
     components:{
-      Emoji
+      Emoji,
+      Map
     },
     methods:{
       //触发input的上传事件
       showAblum(){
-        console.log('show')
-       this.$refs.ablum.click()
+        console.log('ablum',this.$refs.ablum.click())
+        this.$refs.ablum.click()
+      },
+      showCamera(){
+        console.log('camera',this.$refs.camera.click())
+        this.$refs.camera.click()
       },
       //获取相册图片
       getAblum (e) {
-        console.log('相册',e)
+        let file = e.target.files[0];
+        if (window.FileReader) {
+          let reader = new FileReader();
+          if(file){
+            reader.readAsDataURL(file);
+            //监听文件读取结束后事件
+            reader.onloadend = (e) => {
+              //e.target.result就是最后的路径地址
+              // console.log(e.target.result)
+
+              this.send(e.target.result,1)
+            }
+            let formData = new window.FormData();
+            //加入文件对象,向接口传入两个参数file,id
+            let name = new Date().getTime() + this.id
+            formData.append("name", name);
+            formData.append("url", 'user');
+            formData.append("file", file);
+            const config = {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+            axios.post('/files/upload',formData)
+              .then(res =>{
+              console.log(res)
+            })
+          }
+        }
+        console.log(file)
+
+      },
+      //获取拍照图片
+      getCamera(e){
+        this.getAblum(e)
       },
       //获取模块高度
       getElementHeight(){
@@ -160,6 +228,7 @@
       //input聚焦
       focus(){
         this.isemoji = false
+        this.ismore = false
         setTimeout(()=>{
           this.getElementHeight()
         },0)
@@ -178,6 +247,69 @@
         setTimeout(()=>{
           this.msg = ''
         },0)
+      },
+      //音频处理
+      //手指按下
+      handleStart(e){
+        console.log('开始')
+        //点击时y轴位置
+        this.pageY = e.changedTouches[0].pageY
+        this.voicebg = true
+        let i = 1
+        this.timer = setInterval(() => {
+          this.vlength = i
+          i++
+
+          if(i>60){
+            clearInterval(this.timer)
+            this.handleEnd()
+          }
+        },1000)
+        this.getPermission()
+        recorder.start()
+
+      },
+      //获取权限
+      getPermission(){
+        Recorder.getPermission()
+      },
+      //手指释放
+      handleEnd(){
+        // console.log('结束')
+        clearInterval(this.timer)
+        recorder.stop()
+        let res = recorder.getWAVBlob()
+        //获取文件的url地址
+        let objectURL = URL.createObjectURL(res);
+        // console.log('objectURL',objectURL)
+        let data = {
+          voice : objectURL,
+          time : this.vlength
+        }
+        if(this.voicebg){
+          this.send(data,2)
+        }
+        this.vlength = 0
+        this.voicebg = false
+      },
+      //终止录音
+      handleMove(e){
+        if(this.pageY - e.changedTouches[0].pageY >100 ){
+          this.voicebg = false
+        }
+
+      },
+     // 获取地图定位
+      getLocation() {
+        this.isGps = true
+        this.$refs.gps.initMap(container)
+      },
+      position(val){
+        this.isGps = val
+      },
+      addr(val){
+        this.position()
+        this.send(val,3)
       }
 
     }
@@ -191,7 +323,7 @@
     width 100%
     position fixed
     bottom 0
-    z-index 100
+    z-index 101
     /*padding-bottom 10px*/
     .displaynone
       display none
@@ -214,6 +346,8 @@
         padding 6px
         margin 0 5px
       .record
+        user-select none;
+
         .van-field__control
           text-align center !important
           color rgba(39,40,50,0.6)
@@ -283,5 +417,37 @@
           font-size 12px
           color rgba(39,40,50,0.5)
           line-height 17px
-
+  .voice-bg
+    height 100%
+    width 100%
+    background-color rgba(0,0,0,0.3)
+    position fixed
+    top 0
+    bottom 0
+    z-index 100
+    .voice-bg-len
+      height 42px
+      width 300px
+      position absolute
+      left 0
+      right 0
+      top 0
+      bottom 0
+      margin auto
+      background-color rgba(255,255,255,0.2)
+      border-radius 21px
+      text-align center
+      .voice-bg-time
+        display inline-block
+        min-width 60px
+        line-height 42px
+        background-color #A5D2FF
+        border-radius 21px
+    .voice-del
+      position absolute
+      bottom 70px
+      width 100%
+      text-align center
+      color #fff
+      font-size 14px
 </style>

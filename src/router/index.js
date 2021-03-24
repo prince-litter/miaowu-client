@@ -13,6 +13,8 @@ import AdoptionBlogMessage from "../pages/AdoptionBlogMessage/AdoptionBlogMessag
 import ProfilePublish from "../pages/ProfilePublish/ProfilePublish"
 import Register from "../pages/Register/Register"
 import Message from "../pages/Message/Message"
+import Search from "../pages/Search/Search"
+
 Vue.use(Router);
 
 export default new Router({
@@ -69,6 +71,10 @@ export default new Router({
     {
       path:'/register',
       component:Register
+    },
+    {
+      path:'/search',
+      component:Search
     },
     {
       path:'/adoption_shop',

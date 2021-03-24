@@ -94,6 +94,7 @@
      }
    },
     mounted() {
+       this.getLocalStorage()
        new Swiper ('.swiper-container', {
          loop: true, // 循环模式选项
          autoplay:true
@@ -102,6 +103,14 @@
     components:{
       AdoptionList,
       Scroll
+    },
+    methods:{
+     getLocalStorage(){
+       let token = localStorage.getItem('token')
+       if(!token){
+         this.$router.replace('/login')
+       }
+     }
     }
   }
 </script>
