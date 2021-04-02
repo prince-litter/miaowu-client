@@ -1,65 +1,63 @@
 <template>
   <div class="adoption_shop_container">
     <ul class="adoption_shop_list">
-      <li class="adoption_shop_li">
+      <li class="adoption_shop_li" v-for="(item1,index) in data" :key="item1.id">
         <a href="javascript:;">
           <div class="adoption_shop_box">
+            <div class="ad-over" v-show="item1.state === 1 ? true : false">
+              <img src="./images/over1.png" alt="">
+            </div>
             <section class="adoption_shop_user_header">
               <ul>
-                <li><img src="./images/head1.png" alt=""></li>
-                <li class="adoption_user_name">哈狗来吃肉</li>
-                <li class="adoption_vip_icon"><img src="./images/vip.png" alt=""></li>
-                <li class="adoption_focus"><img src="./images/focus.png" alt=""></li>
+                <div @click="$router.push({path:'/adoption_shop_blog',query:{name:item1.name,imgUrl:item1.imgUrl,userId:item1.userId}})">
+                  <li class="ad-img">
+                    <img :src="'http://localhost:3000/public/images/user\\' + item1.imgUrl" alt="">
+                  </li>
+                  <li class="adoption_user_name">{{item1.name}}</li>
+                  <li class="adoption_vip_icon"><img src="./images/vip.png" alt=""></li>
+                </div>
+<!--                <li class="adoption_focus">-->
+<!--                  <div>取消关注</div>-->
+<!--                </li>-->
+                <li class="adoption_focus">
+                  <div>取消关注</div>
+                </li>
               </ul>
             </section>
-            <section class="adoption_shop_pet_content" @click="goDetail">
-              <p class="adoption_pet_msg">小猫咪，母猫乳白色，具体品种未知，但是挺好看。一窝生了十只崽崽，养不起...</p>
-              <img class="adoption_pet_img" src="./images/active-img1.jpg" alt="">
-              <ul>
+            <section class="adoption_shop_pet_content">
+              <p class="adoption_pet_msg">{{item1.tex}}</p>
+<!--              <img class="adoption_pet_img" src="./images/active-img1.jpg" alt="">-->
+              <div class="list-img" style="overflow: hidden">
+                <div v-if="item1.imgArr.length == 1">
+                  <div v-for="(item2,index2) in item1.imgArr" class="img1">
+                    <van-image fit="cover" width="200" height="200" :src="'http://localhost:3000\\' + item2" @click.stop="look(item1.imgArr,index2)" />
+                  </div>
+                </div>
+                <div v-else-if="item1.imgArr.length ==2 || item1.imgArr.length ==4">
+                  <div v-for="(item2,index2) in item1.imgArr" class="img2">
+                    <van-image  fit="cover"  width="120" height="120" :src="'http://localhost:3000\\' + item2" @click.stop="look(item1.imgArr,index2)" />
+                  </div>
+                </div>
+                <div v-else>
+                  <div v-for="(item2,index2) in item1.imgArr" class="img">
+                    <van-image  fit="cover"  width="100%" height="100" :src="'http://localhost:3000\\' + item2" @click.stop="look(item1.imgArr,index2)" />
+                  </div>
+                </div>
+              </div>
+              <ul class="ad-bottom">
                 <li>
-                  <i class="iconfont icon-message"></i>
+                  <van-icon size="20"  name="comment-o" @click="pinglun(item.id)" />
                   <span>10k</span>
                 </li>
                 <li>
-                  <i class="iconfont icon-collecthover"></i>
+                  <van-icon size="20" v-if="is" name="good-job" color="#FF8AA2" @click="quxiao()"/>
+                  <van-icon size="20" v-else name="good-job-o"  @click="dianzhan()"/>
                   <span>1534</span>
                 </li>
                 <li>
                   <!--                      <i class="iconfont icon-praise"></i>-->
-                  <img src="./images/praise.png" alt="">
-                  <span>973</span>
-                </li>
-              </ul>
-            </section>
-          </div>
-        </a>
-      </li>
-      <li class="adoption_shop_li">
-        <a href="javascript:;">
-          <div class="adoption_shop_box">
-            <section class="adoption_shop_user_header">
-              <ul>
-                <li><img src="./images/head2.png" alt=""></li>
-                <li class="adoption_user_name">金角大王</li>
-                <!--                    <li class="vip_icon"><img src="./images/vip.png" alt=""></li>-->
-                <li class="adoption_focus"><img src="./images/focus.png" alt=""></li>
-              </ul>
-            </section>
-            <section class="adoption_shop_pet_content" @click="goDetail">
-              <p class="adoption_pet_msg">小猫咪，母猫乳白色，具体品种未知，但是挺好看。一窝生了十只崽崽，养不起...</p>
-              <img class="adoption_pet_img" src="./images/active-img1.jpg" alt="">
-              <ul>
-                <li>
-                  <i class="iconfont icon-message"></i>
-                  <span>10k</span>
-                </li>
-                <li>
-                  <i class="iconfont icon-collecthover"></i>
-                  <span>1534</span>
-                </li>
-                <li>
-                  <!--                      <i class="iconfont icon-praise"></i>-->
-                  <img src="./images/praise.png" alt="">
+                  <van-icon size="20" v-if="is" name="like" color="#FF8AA2" @click="qxshouchang()"/>
+                  <van-icon size="20" v-else name="like-o" color="#000000" @click="shouchang()"/>
                   <span>973</span>
                 </li>
               </ul>
@@ -71,31 +69,115 @@
   </div>
 </template>
 <script>
+  import Vue from 'vue';
+  import {
+    Swipe,
+    SwipeItem,
+    Lazyload,
+    PullRefresh,
+    List,
+    Cell,
+    ImagePreview,
+    Icon,
+    Image as VanImage,
+    Grid,
+    GridItem
+  } from 'vant';
+  Vue.use(VanImage);
+  Vue.use(ImagePreview);
   export default {
+    props:{
+      Lists:Array
+    },
+    mounted(){
+     this.getlist()
+    },
     data(){
       return{
+        count:1,
+        is:false,
+        isover:false,
+        data:[],
+        img:[
+          {url:'../../../static/active-img1.jpg'},
+          // {url:'../../../static/active-img1.jpg'},
+          // {url:'../../../static/active-img1.jpg'},
+          // {url:'../../../static/active-img1.jpg'},
+          // {url:'../../../static/active-img1.jpg'},
+          // {url:'../../../static/active-img1.jpg'},
 
+
+          ]
       }
+    },
+    watch:{
+      Lists:{
+        handler(n){
+          // console.log(n)
+          this.data = JSON.parse(JSON.stringify(n))
+        },
+        deep:true
+      }
+
+    },
+    components: {
+      [Swipe.name]: Swipe,
+      [SwipeItem.name]: SwipeItem,
+      [Lazyload.name]: Lazyload,
+      [PullRefresh.name]: PullRefresh,
+      [List.name]: List,
+      [Cell.name]: Cell,
+      [Grid.name]: Grid,
+      [GridItem.name]: GridItem,
+      [ImagePreview.name]: ImagePreview,
+      [Icon.name]: Icon,
+      [VanImage.name]: VanImage,
     },
     methods:{
       goDetail(){
         this.$router.push('/adoption_shop')
-      }
+      },
+      look(url,index2) {
+        let arr = []
+        url.forEach(item => {
+          item = 'http://localhost:3000\\' + item
+          arr.push(item)
+        })
+        ImagePreview({
+          images:arr,
+          closeable: true,
+          startPosition: index2,
+        })
+      },
+      getlist(){
+        this.data = JSON.parse(JSON.stringify(this.Lists))
+        // console.log(this.data)
+      },
+
     }
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
+  @import "../../common/stylus/mixins.styl"
   .adoption_shop_container
     margin-top 10px
     .adoption_shop_list
       margin-bottom 20px
+      background-color rgba(230,230,230,0.5)
       .adoption_shop_li
         width 100%
+        background-color #fff
         .adoption_shop_box
           width 100%
-          background-color #fbfbfb
-          padding 10px 0 20px 0
+          padding 10px 0 10px 0
           margin-bottom 5px
+          position relative
+          .ad-over
+            position absolute
+            z-index 99
+            top 50%
+            left 50%
+            transform translate(-50%,-50%)
           .adoption_shop_user_header
             ul
               margin-left 20px
@@ -104,6 +186,11 @@
                 display inline-block
                 text-align center
                 vertical-align middle
+                &.ad-img
+                  img
+                    width 50px
+                    height 50px
+                    border-radius 50%
                 &.adoption_user_name
                   font-size 20px
                   font-weight bold
@@ -115,26 +202,57 @@
                 &.adoption_focus
                   position absolute
                   right 20px
-                  bottom 0px
+                  bottom 0
+                  div
+                    background-color #FF8AA2
+                    font-size 14px
+                    color #fff
+                    height 23px
+                    width 80px
+                    border-radius 15px
+                    line-height 23px
           .adoption_shop_pet_content
-            margin-left 80px
+            padding 0 15px
             .adoption_pet_msg
-              font-size 13px
+              font-size 14px
               font-family "Arial"
               font-weight bold
-              margin 15px 0
+              margin 10px 0 5px 0
               color #7F7F7F
-              line-height 15px
-            .adoption_pet_img
-              margin-bottom 15px
-            ul li
-              display inline-block
-              margin-right 20px
-              vertical-align middle
-              .iconfont
-                font-size 20px
-                color #7D7D7D
+              line-height 17px
+            ul
+              background-color #fff
+              margin-top 10px
+              display flex
+              justify-content space-around
+              vertical-align center
+              li
+                display flex
+                margin-right 20px
+                vertical-align center
+                line-height 20px
+                span
+                 margin-left 10px
 
 
+  .img {
+    float: left;
+    width: 31%;
+    height: 100px;
+    margin: 3px;
+  }
 
+  .img1 {
+    float: left;
+    width: 200px;
+    height: 200px;
+    margin: 2px;
+  }
+
+  .img2 {
+    float: left;
+    width: 120px;
+    height: 120px;
+    margin: 2px;
+  }
 </style>

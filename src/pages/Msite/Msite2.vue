@@ -17,47 +17,68 @@
     <Scroll class="miste-wrapper">
       <div>
         <nav class="msite_nav">
-          <van-swipe :autoplay="3000" :loop="true" :width="375" indicator-color="#FF8AA2">
-            <van-swipe-item v-for="(image, index) in images" :key="index">
-              <img v-lazy="image" />
-            </van-swipe-item>
-          </van-swipe>
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <a href="javascript:">
+                  <div class="banner_container">
+                    <img src="./images/banner1.jpg" alt="">
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <a href="javascript:">
+                  <div class="banner_container">
+                    <img src="./images/banner2.jpg" alt="">
+                  </div>
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <a href="javascript:">
+                  <div class="banner_container">
+                    <img src="./images/banner3.jpg" alt="">
+                  </div>
+                </a>
+              </div>
+            </div>
+            <!--        Add Pagination-->
+            <div class="swiper-pagination"></div>
+          </div>
         </nav>
         <div class="pet_list">
-          <div class="msite-icon">
-            <div class="item-wrap" @click="goPub">
-              <div class="icon-item one">
-                <img src="./images/out.png" alt="">
-              </div>
-              <div>宠物发布</div>
-            </div>
-            <div class="item-wrap" @click="goYh">
-              <div class="icon-item two">
-                <img src="./images/yh.png" alt="">
-              </div>
-              <div>宠物医护</div>
-            </div>
-
-            <div class="item-wrap">
-              <div class="icon-item three">
-                <img src="./images/msg.png" alt="">
-              </div>
-              <div>最新信息</div>
-            </div>
-
-          </div>
           <div class="adoption_header">
             <span>Adopt animals</span>
             <p>做他们一生的家人</p>
           </div>
-          <div class="msite-guide">
-            <div class="guide-item" @click="goly">
-              <img src="./images/adoption.png" alt="">
-            </div>
-            <div class="guide-item" @click="gojy">
-              <img src="./images/jy4.png" alt="">
-            </div>
-          </div>
+
+<!--          <div class="pet_header">-->
+<!--            <ul class="nav-lists">-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>推荐</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list on">-->
+<!--                <a href="javascript:">-->
+<!--                  <span class="active">同城</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>话题</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--              <li class="nav-list">-->
+<!--                <a href="javascript:">-->
+<!--                  <span>猫小组</span>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </div>-->
+
+
+
+          <AdoptionList/>
         </div>
       </div>
     </Scroll>
@@ -66,26 +87,21 @@
 <script>
   import AdoptionList from '../../components/AdoptionList/AdoptionList'
   import Scroll from '../../components/Scroll/Scroll'
-  import { Swipe, SwipeItem,Lazyload  } from 'vant';
-  import Vue from 'vue';
-  Vue.use(Swipe);
-  Vue.use(SwipeItem);
-  Vue.use(Lazyload);
+  import Swiper from 'swiper'
   // import BScroll from 'better-scroll'
-
+  import 'swiper/swiper-bundle.min.css'
   export default {
    data(){
      return{
-       images: [
-         '../../../static/jy.png',
-         '../../../static/ly.png',
-       ],
        search:''
      }
    },
     mounted() {
        this.getLocalStorage()
-
+       new Swiper ('.swiper-container', {
+         loop: true, // 循环模式选项
+         autoplay:true
+       })
     },
     components:{
       AdoptionList,
@@ -97,18 +113,7 @@
        if(!token){
          this.$router.replace('/login')
        }
-     },
-      goly(){
-       this.$router.push('/lyArticle')
-      },
-      goPub(){
-        this.$router.push('/profile_publish')
-      },
-      gojy(){
-       this.$router.push('/jyArticle')
-      },
-      goYh(){
-        this.$router.push('/medic')      }
+     }
     }
   }
 </script>
@@ -166,43 +171,25 @@
       .msite_nav
         padding-top 20px
         height 159px
-        .van-swipe
-         .van-swipe-item
-          /*width 100% !important*/
+        .swiper-container
+          width 100%
+          height 100%
+          z-index 1
+          .swiper-wrapper
+            width 100%
+            height 100%
+            .swiper-slide
+              display flex
+              justify-content center
+              flex-wrap nowrap
+              img
+                border-radius 15px
       .pet_list
         width 100%
         margin-top 30px
-        .msite-icon
-          display flex
-          justify-content space-around
-          .item-wrap
-            font-size 14px
-            display flex
-            flex-direction column
-            justify-content center
-            .icon-item
-              width 45px
-              height 45px
-              text-align center
-              border-radius 15px
-              margin 0 auto 10px
-              img
-                margin-top 9px
-                width 60%
-            .one
-              background-color #A5D2FF
-            .two
-              background-color rgba(255, 154, 83, 0.87)
-            .three
-              background-color #FF8AA2
-              img
-                margin-top 4px
-                width 37px
-
         .adoption_header
           margin-left 21px
-          /*margin-bottom 20px*/
-          margin-top 20px
+          margin-bottom 20px
           span
             font-size 22.5px
             font-family "Arial"
@@ -214,14 +201,27 @@
             font-family "Arial"
             margin-top 10px
             font-weight bold
-        .msite-guide
-          margin-top 10px
-          padding 10px
-          .guide-item
-            /*background-color green*/
-            margin-bottom 5px
-            width 100%
-            img
-              width 100%
-              border-radius 10px
+
+ /*
+
+  .pet_header
+    padding 0px 20px 0
+    width 100%
+    .nav-list
+      display inline-block
+      padding 0 10px
+      margin-left -10px
+      text-align center
+      &.on
+        background url("./images/rectangle-list.png") no-repeat center bottom
+      span
+        width 100%
+        font-size 18px
+        font-family  "Arial"
+        font-weight bold
+        color #AAAAAA
+        &.active
+          color #7F7F7F
+
+ */
 </style>

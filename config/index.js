@@ -11,16 +11,19 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/medic':{
-        target:'http://localhost:3000',
-        changeOrigin:true
-      },
-      '/users/*':{
-        target:'http://localhost:3000'
-      },
-      '/files/*':{
-        target:'http://localhost:3000'
-      }
+      // '/medic':{
+      //   target:'http://localhost:3000',
+      //   changeOrigin:true
+      // },
+      // '/users/*':{
+      //   target:'http://localhost:3000'
+      // },
+      // '/files/*':{
+      //   target:'http://localhost:3000'
+      // },
+      // '/chat/*':{
+      //   target:'http://localhost:3000'
+      // },
     },
 
     // Various Dev Server settings

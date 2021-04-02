@@ -20,17 +20,18 @@
           </div>
           <div class="blog-content_nav">
             <a class="nav_item">
-              <span>获赞</span>
+              <span>讨论</span>
               <span class="blog-num">60</span>
             </a>
             <a class="nav_item">
               <span>发布</span>
-              <span class="blog-num">{{pubNum}}</span>
+              <span class="blog-num">2</span>
             </a>
             <a class="nav_item">
               <span>粉丝</span>
               <span class="blog-num">5460</span>
             </a>
+
           </div>
           <div class="blog-active">
             <div class="blog-active-nav">
@@ -39,16 +40,51 @@
                   <span class="nav-title on">文章发布</span>
                   <span class="active on"></span>
                 </li>
-<!--                <li>-->
-<!--                  <span class="nav-title">收养发布</span>-->
-<!--                  <span class="active"></span>-->
-<!--                </li>-->
+                <li>
+                  <span class="nav-title">收养发布</span>
+                  <span class="active"></span>
+                </li>
               </ul>
             </div>
             <div class="blog-message" @click="goMessage">
               <i class="iconfont icon-message"></i>
             </div>
-            <Article :list="list"/>
+            <div class="blog_dynamic">
+              <section class="left">
+                <div class="time_line">
+                  <div><span class="time_point on"></span></div>
+                  <div><span class="time_point"></span></div>
+                  <div><span class="time_point"></span></div>
+
+                </div>
+              </section>
+              <section class="middle">
+                <ul>
+                  <li>
+                    <p class="day">20</p>
+                    <p class="month-year">Mar</p>
+                    <p class="month-year">2020</p>
+                  </li>
+                  <li>
+                    <p class="day">20</p>
+                    <p class="month-year">Mar</p>
+                    <p class="month-year">2020</p>
+                  </li>
+                  <li>
+                    <p class="day">20</p>
+                    <p class="month-year">Mar</p>
+                    <p class="month-year">2020</p>
+                  </li>
+                </ul>
+              </section>
+              <section class="right">
+                <ul>
+                  <li><a href="javascript:;"><img src="./images/active-img1.png" alt=""></a></li>
+                  <li><a href="javascript:;"><img src="./images/active-img2.png" alt=""></a></li>
+                  <li><a href="javascript:;"><img src="./images/active-img3.png" alt=""></a></li>
+                </ul>
+              </section>
+            </div>
           </div>
         </div>
       </Scroll>
@@ -58,42 +94,17 @@
 </template>
 <script>
   import Scroll from '../../components/Scroll/Scroll'
-  import Article from '../../components/Article/Article'
   import axios from 'axios'
-  import Vue from 'vue';
-  import {
-    ImagePreview,
-    Image as VanImage
-  } from 'vant';
-  Vue.use(VanImage);
-  Vue.use(ImagePreview);
   export default {
     data(){
       return{
-        img:[
-          {url:'../../../static/active-img1.jpg'},
-          {url:'../../../static/active-img1.jpg'},
-          {url:'../../../static/active-img1.jpg'},
-          {url:'../../../static/active-img1.jpg'},
-          {url:'../../../static/active-img1.jpg'},
-          {url:'../../../static/active-img1.jpg'},
 
-
-        ],
-        list:[],
-        pubNum:null
       }
     },
     components:{
-      Scroll,
-      Article
-    },
-    mounted(){
-      this.getArticle()
-      this.getPubNub()
+      Scroll
     },
     methods:{
-
       goMessage(){
         let id = this.$route.query.userId
         let name =this.$route.query.name
@@ -110,35 +121,7 @@
             console.log('关系建立失败')
           }
         })
-      },
-      getPubNub(){
-        let id = this.$route.query.userId
-        axios.get('articles/pubNum',{
-          params:{
-            id:id,
-          }
-        }).then((res) => {
-          if(res.data.status === '200'){
-            this.pubNum = res.data.result
-           // console.log(res.data.result)
-          }else {
-            console.log('获取失败')
-          }
-        })
-      },
-      getArticle(){
-        let id = this.$route.query.userId
-        axios.post('/articles/getUser',{userId:id})
-          .then((res)=>{
-            if(res.data.status === '200'){
-                let result = res.data.result
-                let time = new Date(result[0].time).getFullYear()
-                this.list = JSON.parse(JSON.stringify(result))
-                // console.log(result)
-            }
-          })
-      },
-
+      }
     }
   }
 </script>
@@ -249,6 +232,9 @@
                     left -5px
                     top -5px
 
+
+
+
           .blog-message
             width 83px
             height 83px
@@ -262,5 +248,52 @@
               font-size 33px
               color #fff
               line-height 83px
-
+          .blog_dynamic
+            margin 25px auto 0
+            display flex
+            .left
+              margin-left 30px
+              .time_line
+                position relative
+                display flex
+                flex-direction column
+                width 3px
+                height 400px
+                background linear-gradient(top,rgba(255,255,255,1),rgba(255,255,255,0))
+                div
+                  flex 1
+                  .time_point
+                    position absolute
+                    left -11.5px
+                    display block
+                    width 26px
+                    height 26px
+                    background-color rgba(255,255,255,0.3)
+                    border-radius 50%
+                    &.on
+                      background-color rgba(255,255,255,1)
+            .middle
+              margin-left 30px
+              ul
+                li
+                  margin-bottom 55px
+                  p
+                    color #F2F2F2
+                    font-family "Arial"
+                    font-weight bold
+                  .day
+                    font-size 30px
+                    margin-bottom 10px
+                  .month-year
+                    font-size 13px
+                    line-height 18px
+            .right
+              margin-left 50px
+              ul
+                li
+                  margin-bottom 10px
+                  a
+                    display block
+                    img
+                      border-radius 20px
 </style>

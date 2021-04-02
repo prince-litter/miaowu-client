@@ -1,17 +1,17 @@
 <template>
   <div class="adoptionBlogMessage">
       <div class="message_header">
-        <a href="javascript:" class="go_back" @touchstart="$router.back(),{passive:false}">
+        <a href="javascript:" class="go_back" @click.stop="goBack">
           <i class="iconfont icon-back"></i>
         </a>
-        <p class="message_name">哈狗来了</p>
+        <p class="message_name">{{fname}}</p>
       </div>
-      <Scroll class="adoptionBlogMessage-wrapper" :scrollToEndFlag="true" ref="scroll">
+      <Scroll class="adoptionBlogMessage-wrapper" :scrollToEndFlag="true" :data="msgs" ref="scroll">
         <div class="chat-main" :style="{paddingBottom:inputh}">
             <div class="chat-ls" v-for="(item,index) in msgs" :key="index">
               <div class="message_time" v-if="item.time !== ''">{{changeTime(item.time)}}</div>
-              <div class="msg-m msg-left" v-if="item.id !== 'b'">
-              <img class="user-img" :src="item.imgUrl" alt="">
+              <div class="msg-m msg-left" v-if="fid == item.fromId">
+              <img class="user-img" :src="fimgurl" alt="" @click="goZy(fimgurl,fname,fid)">
               <div class="message" v-if="item.types === 0">
                 <div class="msg-text">{{item.message}}</div>
               </div>
@@ -31,13 +31,13 @@
                 <div class="msg-map">
                   <div class="map-name">{{item.message.address}}</div>
                   <div class="map-address">{{item.message.address}}</div>
-                  <div class="map" :id="item.tip"></div>
+                  <div class="map" :id="item.id"></div>
                 </div>
 
               </div>
             </div>
-              <div class="msg-m msg-right" v-if="item.id == 'b'">
-                <img class="user-img" :src="item.imgUrl" alt="">
+              <div class="msg-m msg-right" v-if="uid ===item.fromId">
+                <img class="user-img" :src="uimgurl" alt="" @click="goZy(uimgurl,uname,uid)">
                 <!-- 文字-->
                 <div class="message" v-if="item.types === 0">
                   <div class="msg-text">{{item.message}}</div>
@@ -61,7 +61,7 @@
                   <div class="msg-map">
                     <div class="map-name">{{item.message.address}}</div>
                     <div class="map-address">{{item.message.address}}</div>
-                    <div class="map" :id="item.tip"></div>
+                    <div class="map" :id="item.id"></div>
                   </div>
 
                 </div>
@@ -89,8 +89,9 @@
   import Submit from '../../components/Submit/Submit'
   import datas from '../../common/js/datas'
   import myfun from '../../common/js/myfun'
+  import axios from 'axios'
   import Vue from 'vue';
-  import { ImagePreview } from 'vant';
+  import { ImagePreview,Toast } from 'vant';
 
   // 全局注册
   Vue.use(ImagePreview);
@@ -99,10 +100,18 @@
       return{
         msgs:[],
         imgMsg:[],
-        oldTime:new Date(),
+        oldTime:0,
         inputh:'54px',
         isPlay:false,
-        nowpage:0 //页数
+        nowpage:0 ,//页数,
+        uname:'',
+        uid:'',
+        uimgurl:'',
+        token:'',
+        fid:'',
+        fimgurl:'',
+        fname:'',
+        pagesize:10,
       }
     },
     components:{
@@ -110,23 +119,109 @@
       Submit
     },
     mounted(){
-      this.getMsg()
-      setTimeout(() => {
-        this.getmap()
-      },50)
+      this.receiveSocketMsg()
+      this.getStorages()
+      this.fid = this.$route.query.id
+      this.fname = this.$route.query.name
+      this.fimgurl = this.$route.query.img
+      let token =localStorage.getItem('token')
+      if(token){
+        this.getMsg(this.nowpage)
+        if(this.msgs){
+            setTimeout(() => {
+              this.getmap()
+            },50)
+        }
 
+      }
+    },
 
+    watch:{
+      msgs:{
+        handler(){
+          setTimeout(()=>{
+            this.$nextTick(() => {
+              this.$refs.scroll.ScrollToEndFlag();
+            })
+          },50)
+
+        },
+        immediate:true,
+        deep:true
+  }
     },
     methods:{
+      goZy(imgUrl,name,id){
+
+        let arr =imgUrl.split('/')
+        let img = arr[arr.length-1]
+        this.$router.push({path:'/adoption_shop_blog',query:{name:name,imgUrl:img,userId:id}})
+      },
+      //返回
+      goBack(){
+        this.$router.back()
+        axios.post('users/updateMsg',{
+          id:this.fid,
+          friendId:this.uid
+        }).then((res) => {
+          if(res.data.status == 200){
+            console.log('成功')
+          }else {
+            console.log('失败')
+          }
+        })
+      },
+      //获取缓存数据
+      getStorages(){
+        try {
+          let token = localStorage.getItem('token')
+          if(token){
+            this.uid = localStorage.getItem('userId')
+            this.uname = localStorage.getItem('userName')
+            this.uimgurl = 'http://localhost:3000/public/images/user/' + localStorage.getItem('imgUrl')
+            this.token = token
+          }else {
+            this.$router.replace('/login')
+          }
+        }catch (e) {
+
+        }
+      },
       //创建地图
       getmap () {
         let info = this.msgs
+        // console.log(info,'info')
         info.forEach(item =>{
           if(item.types === 3){
-            let lat = item.message.latitude
-            let lon = item.message.longitude
-            // console.log(typeof lat)
-            let map = new AMap.Map(`${item.tip}`, {
+          // console.log('item',item)
+         item.message = JSON.parse(item.message)
+          let lat = item.message.latitude
+          let lon = item.message.longitude
+          let map = new AMap.Map(`${item.id}`, {
+            center:[lon, lat],
+            zoom:14
+          });
+          // 创建一个 Marker 实例：
+          let marker = new AMap.Marker({
+            position: new AMap.LngLat(lon, lat),   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+          });
+
+          // 将创建的点标记添加到已有的地图实例：
+          map.add(marker);
+        }
+        })
+
+      },
+      //创建最新地图
+      getmapLast () {
+        let info = this.msgs[this.msgs.length-1]
+        // console.log('infoinfo',info)
+          if(info.types === 3){
+            // console.log('info',info)
+            info.message = JSON.parse(info.message)
+            let lat = info.message.latitude
+            let lon = info.message.longitude
+            let map = new AMap.Map(`${info.id}`, {
               center:[lon, lat],
               zoom:14
             });
@@ -134,11 +229,30 @@
             let marker = new AMap.Marker({
               position: new AMap.LngLat(lon, lat),   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
             });
-
             // 将创建的点标记添加到已有的地图实例：
             map.add(marker);
           }
-        })
+
+      },
+      getmapLast2 () {
+        let info = this.msgs[this.msgs.length-1]
+        // console.log('infoinfo',info)
+        if(info.types === 3){
+          // console.log('info',info)
+          info.message = JSON.parse(info.message)
+          let lat = info.message.latitude
+          let lon = info.message.longitude
+          let map = new AMap.Map(`${info.id}`, {
+            center:[lon, lat],
+            zoom:14
+          });
+          // 创建一个 Marker 实例：
+          let marker = new AMap.Marker({
+            position: new AMap.LngLat(lon, lat),   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+          });
+          // 将创建的点标记添加到已有的地图实例：
+          map.add(marker);
+        }
 
       },
       //预览图片
@@ -154,7 +268,7 @@
       //音频播放
       playVoice(e){
         // this.isPlay = !this.isPlay
-        console.log( this.isPlay)
+        // console.log( this.isPlay)
         this.audio = new Audio()
         this.audio.src = e
         this.audio.play()
@@ -162,11 +276,86 @@
         //   this.audio.play()
         // }
 
+      },
+      //获取消息
+      getMsg(page) {
+        axios.post('chat/msg',{
+            id:this.uid,
+            friendId:this.fid,
+            nowPage:page,
+            pageSize:this.pageSize,
+            token:this.token
+          }).then((res) =>{
+          // console.log(res)
+          if(res.data.status === '200'){
+            let msg = res.data.result
+            //将获取的数据倒序
+            msg.reverse();
+            if(msg.length>0){
+              let oldtime = msg[0].time
+              let imgarr = []
+              msg.forEach((item,index)=>{
+                if(index === 0){
+                  return
+                }
+                // item.imgUrl = 'http://localhost:3000/public/images/user/' + item.imgUrl
+                // item.imgUrl = 'http://localhost:3000\\' + item.imgUrl
+                //时间间隔
+                if(index < msg.length - 1){
+                  let t = myfun.spaceTime(oldtime,item.time)
+                  if(t){
+                    oldtime = t
+                  }
+                  item.time = t
+                }
+                //匹配最大时间
+                if(this.nowpage == 0){
+                  if(item.time > this.oldTime){
+                    this.oldTime = item.time
+                  }
+                }
+                //处理发送的图片地址
+                if(item.types === 1){
+                  item.message = 'http://localhost:3000\\' + item.message
+                  // item.message = 'http://localhost:3000/public/images/user/' + item.message
+                  imgarr.push(item.message)
+                  // this.imgMsg.unshift(item.message)
+                }
+                // this.msgs.unshift(item)
+                //json字符串还原
+                if(item.types === 2){
+                  item.message = JSON.parse(item.message)
+                }
+              })
 
+              this.msgs = msg.concat(this.msgs)
+              this.imgMsg = imgarr.concat(this.imgMsg)
+            }
+            //判断nowPage
+            if(msg.length == 10){
+              this.nowpage++;
+            }else {
+              //数据获取完毕
+              this.nowpage = -1
+            }
+            //页数加一
+            // this.$nextTick(()=>{
+            //   this.$refs.scroll.ScrollToEndFlag();
+            // })
+          }
+          else if(res.data.status === '300'){
+            Toast('登录过期请重新登录')
+            setTimeout(()=>{
+              this.$router.replace({path:'login',query:{userName:this.userName}})
+            },1000)
+          }else {
+            console.log('系统出现错误')
+          }
+        })
 
       },
       //获取消息
-      getMsg() {
+      getMsg1() {
         let msg = datas.message()
         msg.forEach((item,index)=>{
           item.imgUrl = '../../../static/images/' + item.imgUrl
@@ -192,36 +381,145 @@
         return myfun.dataTime1(date)
       },
       //接收输入内容
-      inputs(e){
-        let len = this.msgs.length
+      inputs(e,file){
+         this.receiveMsg(e,this.uid,this.uimgurl,file,0,)
+      },
+      //接收消息
+      receiveMsg(e,id,img,file,tip){
+        //tip==0表示自己发的，tip==1
+
+        if(e.types === 0 || e.types === 3 || e.types === 2){
+          //发送消息给后端
+          this.sendSocket(e)
+        }
+        if(e.types === 1 ){
+          this.imgMsg.push(e.message)
+          //提交图片
+          //当前日期文件夹
+          let url =myfun.fileName(new Date())
+          let formData = new window.FormData();
+          let name = new Date().getTime() + this.uid+Math.ceil(Math.random()*10)
+          formData.append("name", name);
+          formData.append("url", url);
+          formData.append("file", file);
+          axios.post('/files/upload',formData)
+            .then(res =>{
+              // console.log('path',res.data.result.path)
+              let data = {
+                message:res.data.result.path,
+                types:1
+              }
+              this.sendSocket(data)
+            })
+        }
+        // if(e.types === 2 ){
+        //   //提交音频
+        //   //当前日期文件夹
+        //   let url =myfun.fileName(new Date())
+        //   let formData = new window.FormData();
+        //   let name = new Date().getTime() + this.uid+Math.ceil(Math.random()*10)
+        //   formData.append("name", name);
+        //   formData.append("url", url);
+        //   formData.append("file",file);
+        //   axios.post('/files/upload',formData)
+        //     .then(res =>{
+        //       console.log('path',res.data.result.path)
+        //       let data = {
+        //         message:res.data.result.path,
+        //         types:2
+        //       }
+        //       this.sendSocket(data)
+        //     })
+        // }
         //处理时间间隔
+        let len = this.msgs.length
         let nowTime = new Date();
         let t = myfun.spaceTime(this.oldTime,nowTime)
         if(t){
           this.oldTime = t
         }
         nowTime = t
+        //json字符串还原
+        if(e.types === 2 ){
+          e.message = JSON.parse(e.message)
+        }
         let data = {
-          id:'b', //用户id
-          imgUrl:'../../../static/images/head-2.jpg',
+          fromId:id, //发送者id
+          imgUrl:img,
           message:e.message,
           types:e.types,                //内容类型（0文字，1图片连接，2音频连接）
           time: nowTime,  //发送时间
-          tip:len
+          id:len
         }
         this.msgs.push(data)
-        setTimeout(() => {
-          this.$nextTick(() => {
-            this.getmap()
-            this.$refs.scroll.ScrollToEndFlag()
-            this.$refs.submit.getElementHeight()
-          })
-        },50)
-        if(e.types === 1 ){
-          this.imgMsg.push(e.message)
+
+        if(e.types === 3){
+          setTimeout(() => {
+            this.$nextTick(() => {
+              this.getmapLast()
+              // this.$refs.scroll.ScrollToEndFlag()
+
+              // this.$refs.submit.getElementHeight()
+            })
+          },50)
         }
 
-        console.log(e)
+      },
+      //聊天数据发送给后端
+      sendSocket (e){
+        //1对1聊天
+        this.$socket.emit('msg',e,this.uid,this.fid)
+      },
+      //socket聊天数据接收
+      receiveSocketMsg (){
+        this.sockets.subscribe('msg',(msg) =>{
+          // console.log('后端发送来的消息:'+ msg )
+          if(msg.fromid === this.fid && msg.flag === 0){
+            let len = this.msgs.length
+            //处理时间间隔
+            let nowTime = new Date();
+            let t = myfun.spaceTime(this.oldTime,nowTime)
+            if(t){
+              this.oldTime = t
+            }
+            //判断是否需要添加ip
+            if(msg.types === 1){
+                msg.message = 'http://localhost:3000\\' + msg.message
+            }
+
+            nowTime = t
+            if( msg.types === 2 ){
+              msg.message = JSON.parse(msg.message)
+            }
+            let data = {
+              fromId:msg.fromid, //发送者id
+              imgUrl:this.fimgurl,
+              message:msg.message,
+              types:msg.types,                //内容类型（0文字，1图片连接，2音频连接）
+              time: nowTime,  //发送时间
+              id:len
+            }
+
+            // console.log('data',data)
+            this.msgs.push(data)
+            // console.log('this.msgs',this.msgs)
+            if(msg.types === 1){
+              this.imgMsg.push(msg.message)
+            }
+            if(msg.types === 3){
+              setTimeout(() => {
+                this.$nextTick(() => {
+                  this.getmapLast2()
+                  // this.$refs.scroll.ScrollToEndFlag()
+
+                  // this.$refs.submit.getElementHeight()
+                })
+              },50)
+            }
+
+          }
+        })
+
       },
       //输入框的高度
       heights(val){
@@ -229,7 +527,6 @@
         this.$nextTick(() => {
           this.$refs.scroll.ScrollToEndFlag();
         })
-
 
       },
 

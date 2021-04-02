@@ -2,9 +2,9 @@
   <section class="loginContainer">
 
     <div class="loginInner">
-      <a href="javascript:" class="go_back" @touchstart="$router.back()">
-        <i class="iconfont icon-back"></i>
-      </a>
+<!--      <a href="javascript:" class="go_back" @touchstart="$router.back()">-->
+<!--        <i class="iconfont icon-back"></i>-->
+<!--      </a>-->
       <div class="login_header">
         <img src="./images/logo.png" alt="">
       </div>
@@ -106,16 +106,6 @@
     overflow hidden
     .loginInner
       margin 70px auto
-      .go_back
-        position absolute
-        top 20px
-        left 25px
-        width 30px
-        height 30px
-        .iconfont
-          font-size 20px
-          color #797979
-          font-weight bold
       .login_content
         height 250px
         width 335px

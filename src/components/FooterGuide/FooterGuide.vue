@@ -39,7 +39,7 @@
       methods:{
         goTo (path){
           this.$router.replace(path);
-          console.log("111")
+          // console.log("111")
 
         }
       }

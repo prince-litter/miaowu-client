@@ -71,7 +71,7 @@
        */
       refreshDelay: {
         type: Number,
-        default: 200
+        default: 20
       },
       // 控制开关滚动到底部
       scrollToEndFlag: {
@@ -80,20 +80,25 @@
       }
     },
     mounted() {
+
+      // 保证在DOM渲染完毕后初始化better-scroll
+      setTimeout(() => {
+        this.$nextTick(() => {
+          if(!this.scroll){
+            this._initScroll()
+          }else {
+            this.scroll.refresh()
+          }
+
+        })
+      }, 50)
       setTimeout(() =>{
         if(this.scrollToEndFlag){
           this.$nextTick(() => {
             this.ScrollToEndFlag()
           })
         }
-      },20)
-
-      // 保证在DOM渲染完毕后初始化better-scroll
-      setTimeout(() => {
-        this.$nextTick(() => {
-          this._initScroll()
-        })
-      }, 200)
+      },200)
 
       // this.ScrollToEndFlag()
 
@@ -104,7 +109,6 @@
         if (!this.$refs.wrapper) {
           return
         }
-        // better-scroll的初始化
         this.scroll = new BScroll(this.$refs.wrapper, {
           probeType: this.probeType,
           click: this.click,
@@ -113,20 +117,22 @@
         if ( this.scrollToEndFlag ) {
           /* this.scroll: 为 better-scroll 的实例 */
           this.scroll.scrollTo(0, this.scroll.maxScrollY)
+          this.$emit('scrollToEnd')
         }
-        this.$emit('scrollToEnd')
+
       },
       _initScroll() {
         if (!this.$refs.wrapper) {
           return
         }
         // better-scroll的初始化
-        this.scroll = new BScroll(this.$refs.wrapper, {
-          probeType: this.probeType,
-          click: this.click,
-          scrollX: this.scrollX
-        })
-
+        if(!this.scroll){
+          this.scroll = new BScroll(this.$refs.wrapper, {
+            probeType: this.probeType,
+            click: this.click,
+            scrollX: this.scrollX
+          })
+        }
         // 是否派发滚动事件
         if (this.listenScroll) {
           this.scroll.on('scroll', (pos) => {
@@ -143,8 +149,13 @@
             }
           })
         }
+        if ( this.scrollToEndFlag ) {
+          /* this.scroll: 为 better-scroll 的实例 */
+          this.scroll.scrollTo(0, this.scroll.maxScrollY)
+          this.$emit('scrollToEnd')
+        }
 
-        // 是否派发顶部下拉事件，用于下拉刷新
+
         if (this.pulldown) {
           this.scroll.on('touchend', (pos) => {
             // 下拉动作
@@ -185,10 +196,14 @@
     },
     watch: {
       // 监听数据的变化，延时refreshDelay时间后调用refresh方法重新计算，保证滚动效果正常
-      data() {
-        setTimeout(() => {
-          this.refresh()
-        }, this.refreshDelay)
+      data:{
+        handler () {
+            setTimeout(() => {
+              this.refresh()
+            }, this.refreshDelay)
+          },
+        immediate:true,
+        deep:true
       }
     }
   }
@@ -198,4 +213,5 @@
 .wrapper
   height calc(100vh - 135px)
   overflow hidden
+  touch-action none
 </style>

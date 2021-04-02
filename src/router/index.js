@@ -14,6 +14,9 @@ import ProfilePublish from "../pages/ProfilePublish/ProfilePublish"
 import Register from "../pages/Register/Register"
 import Message from "../pages/Message/Message"
 import Search from "../pages/Search/Search"
+import LyArticle from "../pages/LyArticle/LyArticle"
+import JyArticle from "../pages/JyArticle/JyArticle"
+import MyTask from "../pages/MyTask/MyTask";
 
 Vue.use(Router);
 
@@ -91,6 +94,18 @@ export default new Router({
     {
       path:'/medic_shop',
       component:MedicShop
-    }
+    },
+    {
+      path:'/lyArticle',
+      component:LyArticle
+    },
+    {
+      path:'/jyArticle',
+      component:JyArticle
+    },
+    {
+      path:'/myTask',
+      component:MyTask
+    },
   ]
 })

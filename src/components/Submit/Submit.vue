@@ -69,13 +69,13 @@
 
 
      </div>
-     <div class="voice-bg" v-show="voicebg">
+     <div class="voice-bg" v-if="voicebg">
        <div class="voice-bg-len">
          <div class="voice-bg-time" :style="{width:vlength/0.6+'%'}">{{vlength}}〞</div>
        </div>
        <div class="voice-del">上划取消录音</div>
      </div>
-     <Map v-show="isGps" ref="gps" :isGps="isGps" @position="position" @addr="addr"/>
+     <Map v-if="isGps" ref="gps" :isGps="isGps" @position="position" @addr="addr"/>
   </div>
 </template>
 <script>
@@ -85,7 +85,7 @@
   import  Map from '../../components/Map/Map';
   import Recorder from 'js-audio-recorder';
   import axios from 'axios'
-
+  import myfun from '../../common/js/myfun'
 
   let recorder = new Recorder();
   Vue.use(Field);
@@ -103,7 +103,8 @@
           pageY:'',
           isGps:false,
           address:'',
-          id:'abcdfeg'
+          id:'abcdfeg',
+          file:{}
 
       }
     },
@@ -114,16 +115,23 @@
     methods:{
       //触发input的上传事件
       showAblum(){
-        console.log('ablum',this.$refs.ablum.click())
-        this.$refs.ablum.click()
+        // console.log('ablum',this.$refs.ablum.click())
+        //   this.$refs.ablum.click()
+        this.$refs.ablum.dispatchEvent(new MouseEvent('click'))
+
       },
       showCamera(){
-        console.log('camera',this.$refs.camera.click())
-        this.$refs.camera.click()
+        // console.log('camera',this.$refs.camera.click())
+        //   this.$refs.camera.click()
+        this.$refs.camera.dispatchEvent(new MouseEvent('click'))
       },
       //获取相册图片
       getAblum (e) {
+        let url =myfun.fileName(new Date())
         let file = e.target.files[0];
+        this.file = file
+        // console.log(this.file)
+        // console.log('hahah' + typeof(file))
         if (window.FileReader) {
           let reader = new FileReader();
           if(file){
@@ -135,24 +143,19 @@
 
               this.send(e.target.result,1)
             }
-            let formData = new window.FormData();
-            //加入文件对象,向接口传入两个参数file,id
-            let name = new Date().getTime() + this.id
-            formData.append("name", name);
-            formData.append("url", 'user');
-            formData.append("file", file);
-            const config = {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-            axios.post('/files/upload',formData)
-              .then(res =>{
-              console.log(res)
-            })
+            // let formData = new window.FormData();
+            // //加入文件对象,向接口传入两个参数file,id
+            // let name = new Date().getTime() + this.id
+            // formData.append("name", name);
+            // formData.append("url", url);
+            // formData.append("file", file);
+            // axios.post('/files/upload',formData)
+            //   .then(res =>{
+            //   console.log(res)
+            // })
           }
         }
-        console.log(file)
+        // console.log('file',file)
 
       },
       //获取拍照图片
@@ -243,7 +246,7 @@
           message:msg,
           types:type
         }
-        this.$emit('inputs',data)
+        this.$emit('inputs',data,this.file)
         setTimeout(()=>{
           this.msg = ''
         },0)
@@ -279,6 +282,7 @@
         clearInterval(this.timer)
         recorder.stop()
         let res = recorder.getWAVBlob()
+        // this.file = res
         //获取文件的url地址
         let objectURL = URL.createObjectURL(res);
         // console.log('objectURL',objectURL)
@@ -286,8 +290,9 @@
           voice : objectURL,
           time : this.vlength
         }
+        let strdata = JSON.stringify(data)
         if(this.voicebg){
-          this.send(data,2)
+          this.send(strdata,2)
         }
         this.vlength = 0
         this.voicebg = false
@@ -302,14 +307,20 @@
      // 获取地图定位
       getLocation() {
         this.isGps = true
-        this.$refs.gps.initMap(container)
+        this.$nextTick(() => {
+          this.$refs.gps.initMap(container)
+        })
+
       },
       position(val){
         this.isGps = val
       },
       addr(val){
         this.position()
-        this.send(val,3)
+        console.log(val,'addr')
+        //json转化为字符串
+        let stringData = JSON.stringify(val)
+        this.send(stringData,3)
       }
 
     }

@@ -15,12 +15,12 @@
         <div class="profile_content">
           <div class="content_nav">
             <a class="nav_item">
-              <span>讨论</span>
+              <span>收藏</span>
               <span>60</span>
             </a>
             <a class="nav_item" @touchstart="$router.push('/profile_publish')">
               <span>发布</span>
-              <span>2</span>
+              <span>{{pubNum}}</span>
             </a>
             <a class="nav_item">
               <span>粉丝</span>
@@ -32,11 +32,21 @@
             </a>
           </div>
           <div class="content_head">
-            <div class="on"><span>关注</span></div>
-            <div><span>信箱</span></div>
-            <div><span>收藏</span></div>
+            <div class="head-item" @click="$router.push('/myTask')">
+              <img src="./images/fb.png" alt="">
+              <div>我的发布</div>
+            </div>
+            <div class="head-item">
+              <img src="./images/sc.png" alt="">
+              <div>我的收藏</div>
+            </div>
+            <div class="head-item last">
+              <img src="./images/sz.png" alt="">
+              <div>基本设置</div>
+            </div>
           </div>
-          <ProfileList/>
+
+
         </div>
       </div>
     </Scroll>
@@ -45,7 +55,7 @@
 <script>
   import ProfileList from '../../components/ProfileList/ProfileList'
   import Scroll from '../../components/Scroll/Scroll'
-
+  import Article from '../../components/Article/Article'
   import Dialog  from 'vant/lib/dialog';
   import 'vant/lib/dialog/style';
   import axios from  'axios'
@@ -53,15 +63,34 @@
     data(){
       return{
         userName:'',
-        imgUrl:'http://localhost:3000/public/images/user/head-me.jpg'
+        imgUrl:'http://localhost:3000/public/images/user/head-me.jpg',
+        list:[],
+        pubNum:null
       }
     },
     mounted(){
       // this.userName = this.$route.query.userName
       // console.log(localStorage.getItem('token'))
       this.loginCheck()
+      this.getArticle()
+      this.getPubNub()
     },
     methods:{
+      getPubNub(){
+        let id =localStorage.getItem('userId')
+        axios.get('articles/pubNum',{
+          params:{
+            id:id,
+          }
+        }).then((res) => {
+          if(res.data.status === '200'){
+            this.pubNum = res.data.result
+            console.log(res.data.result)
+          }else {
+            console.log('获取失败')
+          }
+        })
+      },
       loginCheck(){
         let imgUrl = localStorage.getItem('imgUrl')
         let token = localStorage.getItem('token')
@@ -100,11 +129,24 @@
           .catch(() => {
           // on cancel
         });
-      }
+      },
+      getArticle(){
+        let id = localStorage.getItem('userId')
+        axios.post('/articles/getUser',{userId:id})
+          .then((res)=>{
+            if(res.data.status === '200'){
+              let result = res.data.result
+              let time = new Date(result[0].time).getFullYear()
+              this.list = JSON.parse(JSON.stringify(result))
+              // console.log(result)
+            }
+          })
+      },
     },
   components:{
     ProfileList,
-    Scroll
+    Scroll,
+    Article
   }
   }
 </script>
@@ -174,28 +216,27 @@
                 font-size 15px
                 font-family "Arial"
                 font-weight bold
-
-
-
           .content_head
-            width 100%
+            margin-top 30px
             display flex
-            margin-left 30px
-            >div
-              background-color #D7D7D7
-              border-radius 15px
-              width 70px
-              height 27px
-              text-align center
-              line-height 27px
-              margin-right 20px
-              margin-top 30px
-              &.on
-                background-color #EE849B
-              span
-                color white
-                font-weight bold
-                font-family "Arial"
-                font-size 13px
+            justify-content space-around
+            padding 0 10px
+            .head-item
+              height 80px
+              width 112px
+              display flex
+              flex-direction column
+              justify-content center
+              align-items center
+              border-right 1px solid rgba(230,230,230,.7)
+              border-bottom 1px solid rgba(230,230,230,.7)
+              font-size 14px
+              img
+                width 35%
+                margin-bottom 15px
+            .last
+              border-right none
+
+
 
 </style>

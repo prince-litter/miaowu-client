@@ -123,7 +123,35 @@ export default {
     if(D<10){
       D = '0' + D;
     }
-    return Y + '-' + M + '-' + 'D'
+    return Y + '-' + M + '-' + D
+  },
+  detailday(e){
+    let old = new Date(e);
+    //获取old具体时间
+    let D = old.getDate();
+
+    //处理时间
+    if(D<10){
+      D = '0' + D;
+    }
+    return D
+  },
+  //文件夹使用的时间
+  fileName(e){
+    let old = new Date(e);
+    //获取old具体时间
+    let Y = old.getFullYear();
+    let M = old.getMonth()+1;
+    let D = old.getDate();
+
+    //处理时间
+    if(M<10){
+      M = '0' + M;
+    }
+    if(D<10){
+      D = '0' + D;
+    }
+    return Y + M + D
   },
 
   //间隔时间差
@@ -132,12 +160,65 @@ export default {
     now = new Date(now);
     let told = old.getTime();
     let tnow = now.getTime();
-    if(told>(tnow+1000*60*5)){
+    if(tnow>(told+1000*60*5)){
       return now;
     }else {
       return '';
     }
+  },
+  //搜索延时作用函数
+  debounce (fn, t) {
+    let timer;
+    let delay = t || 500;
+    return function () {
+      let args = arguments;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        timer = null
+        fn.apply(this, args);
+      }, delay);
+    }
+  },
+
+  //排序
+  paixu(arr,obj,tip){
+    let s;
+    if(tip === 0){
+      //降序排序
+      for (let i=1;i<arr.length;i++){
+        for(let j = i;j > 0;j--){
+          if(arr[j][obj] > arr[j-1][obj]){
+            s = arr[j]
+            arr[j] = arr[j-1];
+            arr[j-1] = s
+          }
+        }
+      }
+      return arr
+    }else if(tip === 1){
+      //升序
+      for (let i=1;i<arr.length;i++){
+        for(let j = i;j > 0;j--){
+          if(arr[j][obj] < arr[j-1][obj]){
+            s = arr[j]
+            arr[j] = arr[j-1];
+            arr[j-1] = s
+          }
+        }
+      }
+      return arr
+    }
+  },
+  createUniqueId() {
+  var random = function() { // 生成10-12位不等的字符串
+    return Number(Math.random().toString().substr(2)).toString(36); // 转换成十六进制
   }
+  var num = random();
+
+  return num;
+}
 
 
 }

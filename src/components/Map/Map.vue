@@ -80,7 +80,7 @@
           // 定位出错
           Toast('定位失败')
           setTimeout(()=>{
-            this.cancel()
+            that.cancel()
           })
           console.log('失败',data)
         }
