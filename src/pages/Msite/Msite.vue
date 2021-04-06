@@ -38,11 +38,11 @@
               <div>宠物医护</div>
             </div>
 
-            <div class="item-wrap">
+            <div class="item-wrap" @click="$router.push('/newArticle')">
               <div class="icon-item three">
                 <img src="./images/msg.png" alt="">
               </div>
-              <div>最新信息</div>
+              <div>最新发布</div>
             </div>
 
           </div>

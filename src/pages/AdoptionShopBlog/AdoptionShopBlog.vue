@@ -21,7 +21,7 @@
           <div class="blog-content_nav">
             <a class="nav_item">
               <span>获赞</span>
-              <span class="blog-num">60</span>
+              <span class="blog-num">{{praiseNum}}</span>
             </a>
             <a class="nav_item">
               <span>发布</span>
@@ -29,7 +29,7 @@
             </a>
             <a class="nav_item">
               <span>粉丝</span>
-              <span class="blog-num">5460</span>
+              <span class="blog-num">{{focusedNum}}</span>
             </a>
           </div>
           <div class="blog-active">
@@ -81,7 +81,9 @@
 
         ],
         list:[],
-        pubNum:null
+        pubNum:0,
+        praiseNum:0,
+        focusedNum:0,
       }
     },
     components:{
@@ -91,6 +93,8 @@
     mounted(){
       this.getArticle()
       this.getPubNub()
+      this.getPraise()
+      this.getFocusedNum()
     },
     methods:{
 
@@ -126,6 +130,19 @@
           }
         })
       },
+      getFocusedNum(){
+        let id = this.$route.query.userId
+        axios.post('users/focusedNum',{
+            id:id,
+        }).then((res) => {
+          if(res.data.status === '200'){
+            this.focusedNum = res.data.result
+            // console.log(res.data.result)
+          }else {
+            console.log('获取失败')
+          }
+        })
+      },
       getArticle(){
         let id = this.$route.query.userId
         axios.post('/articles/getUser',{userId:id})
@@ -135,6 +152,18 @@
                 let time = new Date(result[0].time).getFullYear()
                 this.list = JSON.parse(JSON.stringify(result))
                 // console.log(result)
+            }
+          })
+      },
+      getPraise(){
+        let id = this.$route.query.userId
+        axios.post('/articles/praiseNum',{id:id})
+          .then((res)=>{
+            if(res.data.status === '200'){
+              this.praiseNum = res.data.result
+              // console.log(res.data.result)
+            }else {
+              console.log('获取失败')
             }
           })
       },

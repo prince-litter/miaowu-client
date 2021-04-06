@@ -24,7 +24,7 @@
            </div>
          </div>
          <hr class="ly-hr">
-         <AdoptionList :Lists="Lists"/>
+         <AdoptionList :Lists="Lists" ref="list"/>
        </div>
      </Scroll>
   </div>

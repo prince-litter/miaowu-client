@@ -102,7 +102,7 @@ Vue.use(PullRefresh);
           if(res.data.status === '200'){
             if(arr.length>0){
               arr.forEach((item)=>{
-                item.imgUrl = 'http://localhost:3000/public/images/user/' + item.imgUrl
+                item.imgUrl = 'http://localhost:3000\\' + item.imgUrl
                 this.friends.push(item)
               })
               this.friends = myfun.paixu(this.friends,'lastTime',0)

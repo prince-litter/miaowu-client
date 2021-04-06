@@ -46,7 +46,7 @@
         let strName = data.userName
         let arr = strName.split('>')
         let arr1 = arr[1].split('<')
-        let name = arr1[0]
+        let name = arr1[0] + arr[arr.length-1]
         let uid = localStorage.getItem('userId')
         this.$router.push({path:'/adoption_blog_message',query:{id:data.id,name:name,img:data.imgUrl}})
         axios.post('users/relative',{
@@ -91,7 +91,7 @@
                  return
                }
                if(item.userName.search(val) !== -1){
-                  item.imgUrl = 'http://localhost:3000/public/images/user/' + item.imgUrl
+                  item.imgUrl = 'http://localhost:3000\\' + item.imgUrl
                   item.userName = item.userName.replace(exp,"<span style='color:#A5D2FF;font-weight:bold;'>" + val + "</span>")
                   item.id = item._id
                  this.userArr.push(item)

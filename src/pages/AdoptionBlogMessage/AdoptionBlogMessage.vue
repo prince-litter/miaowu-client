@@ -178,7 +178,7 @@
           if(token){
             this.uid = localStorage.getItem('userId')
             this.uname = localStorage.getItem('userName')
-            this.uimgurl = 'http://localhost:3000/public/images/user/' + localStorage.getItem('imgUrl')
+            this.uimgurl = 'http://localhost:3000\\' + localStorage.getItem('imgUrl')
             this.token = token
           }else {
             this.$router.replace('/login')

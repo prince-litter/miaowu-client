@@ -17,6 +17,9 @@ import Search from "../pages/Search/Search"
 import LyArticle from "../pages/LyArticle/LyArticle"
 import JyArticle from "../pages/JyArticle/JyArticle"
 import MyTask from "../pages/MyTask/MyTask";
+import NewArticle from "../pages/NewAritcle/NewAritcle";
+import MyCollection from "../pages/MyCollection/MyCollection";
+import Change from "../pages/Change/Change";
 
 Vue.use(Router);
 
@@ -106,6 +109,18 @@ export default new Router({
     {
       path:'/myTask',
       component:MyTask
+    },
+    {
+      path:'/newArticle',
+      component:NewArticle
+    },
+    {
+      path:'/myCollection',
+      component:MyCollection
+    },
+    {
+      path:'/change',
+      component:Change
     },
   ]
 })

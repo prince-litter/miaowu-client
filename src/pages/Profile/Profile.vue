@@ -16,36 +16,35 @@
           <div class="content_nav">
             <a class="nav_item">
               <span>收藏</span>
-              <span>60</span>
+              <span>{{collectionNum}}</span>
             </a>
-            <a class="nav_item" @touchstart="$router.push('/profile_publish')">
+            <a class="nav_item" @touchstart="go('/profile_publish')">
               <span>发布</span>
               <span>{{pubNum}}</span>
             </a>
             <a class="nav_item">
               <span>粉丝</span>
-              <span>5460</span>
+              <span>{{focusedNum}}</span>
             </a>
             <a class="nav_item">
               <span>评论</span>
-              <span>48</span>
+              <span>0</span>
             </a>
           </div>
           <div class="content_head">
-            <div class="head-item" @click="$router.push('/myTask')">
+            <div class="head-item" @click="go('/myTask')">
               <img src="./images/fb.png" alt="">
               <div>我的发布</div>
             </div>
-            <div class="head-item">
+            <div class="head-item" @click="go('/MyCollection')">
               <img src="./images/sc.png" alt="">
               <div>我的收藏</div>
             </div>
-            <div class="head-item last">
+            <div class="head-item last" @click="go('/change')">
               <img src="./images/sz.png" alt="">
-              <div>基本设置</div>
+              <div>资料设置</div>
             </div>
           </div>
-
 
         </div>
       </div>
@@ -56,6 +55,7 @@
   import ProfileList from '../../components/ProfileList/ProfileList'
   import Scroll from '../../components/Scroll/Scroll'
   import Article from '../../components/Article/Article'
+  import { Toast } from 'vant'
   import Dialog  from 'vant/lib/dialog';
   import 'vant/lib/dialog/style';
   import axios from  'axios'
@@ -65,17 +65,32 @@
         userName:'',
         imgUrl:'http://localhost:3000/public/images/user/head-me.jpg',
         list:[],
-        pubNum:null
+        pubNum:0,
+        collectionNum:0,
+        focusedNum:0
       }
+    },
+    created(){
+      this.getPubNub()
+      this.getCollectionNum()
+      this.getFocusedNum()
     },
     mounted(){
       // this.userName = this.$route.query.userName
       // console.log(localStorage.getItem('token'))
       this.loginCheck()
       this.getArticle()
-      this.getPubNub()
+
     },
     methods:{
+      go(path){
+        let token = localStorage.getItem('token')
+        if(!token){
+          Toast('请先登录')
+        }else {
+          this.$router.push(path)
+        }
+      },
       getPubNub(){
         let id =localStorage.getItem('userId')
         axios.get('articles/pubNum',{
@@ -85,7 +100,33 @@
         }).then((res) => {
           if(res.data.status === '200'){
             this.pubNum = res.data.result
-            console.log(res.data.result)
+            // console.log(res.data.result)
+          }else {
+            console.log('获取失败')
+          }
+        })
+      },
+      getCollectionNum(){
+        let id =localStorage.getItem('userId')
+        axios.post('articles/collectNum',{
+            id:id,
+        }).then((res) => {
+          if(res.data.status === '200'){
+            this.collectionNum = res.data.result
+            // console.log(res.data.result)
+          }else {
+            console.log('获取失败')
+          }
+        })
+      },
+      getFocusedNum(){
+        let id = localStorage.getItem('userId')
+        axios.post('users/focusedNum',{
+          id:id,
+        }).then((res) => {
+          if(res.data.status === '200'){
+            this.focusedNum = res.data.result
+            // console.log(res.data.result)
           }else {
             console.log('获取失败')
           }
@@ -96,7 +137,7 @@
         let token = localStorage.getItem('token')
         let userName = localStorage.getItem('userName')
         if(token){
-          this.imgUrl = "http://localhost:3000/public/images/user/" + imgUrl
+          this.imgUrl = "http://localhost:3000\\" + imgUrl
           this.userName = userName
         }
 
@@ -123,6 +164,10 @@
               if(res.status == '200'){
                 this.userName=''
                 this.imgUrl = 'http://localhost:3000/public/images/user/head-me.jpg'
+                localStorage.removeItem('token')
+                localStorage.removeItem('userId')
+                localStorage.removeItem('userName')
+                localStorage.removeItem('imgUrl')
               }
             })
           })

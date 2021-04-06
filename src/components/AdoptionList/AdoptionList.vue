@@ -11,16 +11,16 @@
               <ul>
                 <div @click="$router.push({path:'/adoption_shop_blog',query:{name:item1.name,imgUrl:item1.imgUrl,userId:item1.userId}})">
                   <li class="ad-img">
-                    <img :src="'http://localhost:3000/public/images/user\\' + item1.imgUrl" alt="">
+                    <img :src="'http://localhost:3000\\' + item1.imgUrl" alt="">
                   </li>
                   <li class="adoption_user_name">{{item1.name}}</li>
                   <li class="adoption_vip_icon"><img src="./images/vip.png" alt=""></li>
                 </div>
-<!--                <li class="adoption_focus">-->
-<!--                  <div>取消关注</div>-->
-<!--                </li>-->
-                <li class="adoption_focus">
+                <li v-if="attentionList.includes(item1.userId)" class="adoption_focus" @click="focus(item1.userId)">
                   <div>取消关注</div>
+                </li>
+                <li v-else class="adoption_focus" @click="focus(item1.userId)">
+                  <div>关注</div>
                 </li>
               </ul>
             </section>
@@ -47,18 +47,18 @@
               <ul class="ad-bottom">
                 <li>
                   <van-icon size="20"  name="comment-o" @click="pinglun(item.id)" />
-                  <span>10k</span>
+                  <span>10</span>
                 </li>
                 <li>
-                  <van-icon size="20" v-if="is" name="good-job" color="#FF8AA2" @click="quxiao()"/>
-                  <van-icon size="20" v-else name="good-job-o"  @click="dianzhan()"/>
-                  <span>1534</span>
+                  <van-icon size="20" v-if="praiseList.includes(item1.id)" name="good-job" color="#FF8AA2" @click="dianzhan(item1.id,item1.userId)"/>
+                  <van-icon size="20" v-else name="good-job-o"  @click="dianzhan(item1.id,item1.userId)"/>
+                  <span>{{item1.num ? item1.num : 0}}</span>
                 </li>
                 <li>
                   <!--                      <i class="iconfont icon-praise"></i>-->
-                  <van-icon size="20" v-if="is" name="like" color="#FF8AA2" @click="qxshouchang()"/>
-                  <van-icon size="20" v-else name="like-o" color="#000000" @click="shouchang()"/>
-                  <span>973</span>
+                  <van-icon size="20" v-if="collectionList.includes(item1.id)" name="like" color="#FF8AA2" @click="shouchang(item1.id)"/>
+                  <van-icon size="20" v-else name="like-o" color="#000000" @click="shouchang(item1.id)"/>
+                  <span>{{item1.cnum ? item1.cnum : 0 }}</span>
                 </li>
               </ul>
             </section>
@@ -69,6 +69,7 @@
   </div>
 </template>
 <script>
+  import axios from 'axios'
   import Vue from 'vue';
   import {
     Swipe,
@@ -89,8 +90,15 @@
     props:{
       Lists:Array
     },
+    created(){
+      this.getlist()
+    },
     mounted(){
      this.getlist()
+      this.getPraise()
+      this.getCollection()
+      this.getAttention()
+
     },
     data(){
       return{
@@ -98,6 +106,9 @@
         is:false,
         isover:false,
         data:[],
+        praiseList:[],
+        collectionList:[],
+        attentionList:[],
         img:[
           {url:'../../../static/active-img1.jpg'},
           // {url:'../../../static/active-img1.jpg'},
@@ -114,7 +125,9 @@
       Lists:{
         handler(n){
           // console.log(n)
-          this.data = JSON.parse(JSON.stringify(n))
+          //
+          // this.data = JSON.parse(JSON.stringify(n))
+          this.getlist()
         },
         deep:true
       }
@@ -134,6 +147,138 @@
       [VanImage.name]: VanImage,
     },
     methods:{
+      //关注
+      focus(focusedId){
+        let id = localStorage.getItem('userId')
+        axios.post('users/isAttention',{
+          id:id,
+          focusedId:focusedId,
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              this.getAttention()
+            }
+          })
+      },
+      //收藏
+      shouchang(articleId){
+        let id = localStorage.getItem('userId')
+        axios.post('articles/isCollect',{
+          id:id,
+          articleId:articleId,
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              // console.log(res)
+              this.getCollectionNum()
+              this.getCollection()
+            }
+          })
+      },
+      //点赞
+      dianzhan(articleId,authorId){
+        let id = localStorage.getItem('userId')
+        axios.post('articles/isPraise',{
+          id:id,
+          articleId:articleId,
+          authorId:authorId
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              // console.log(res)
+              this.getPraiseNum()
+              this.getPraise()
+            }
+          })
+      },
+      //获取点赞列表
+      getPraise(){
+        let id = localStorage.getItem('userId')
+        axios.post('articles/getPraise',{
+          id:id,
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              // console.log(res.data.result)
+              let praiseList = []
+            res.data.result.forEach(item => {
+              praiseList.push(item.articleId)
+            })
+              this.praiseList = praiseList
+              //console.log()
+            }
+          })
+      },
+      //获取收藏列表
+      getCollection(){
+        let id = localStorage.getItem('userId')
+        axios.post('articles/getCollection',{
+          id:id,
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              // console.log(res.data.result)
+              let collectionList = []
+              res.data.result.forEach(item => {
+                collectionList.push(item.articleId)
+              })
+              this.collectionList = collectionList
+              //console.log()
+            }
+          })
+      },
+      //获取关注列表
+      getAttention(){
+        let id = localStorage.getItem('userId')
+        axios.post('users/getAttention',{
+          id:id,
+        })
+          .then((res) => {
+            if(res.data.status === '200'){
+              // console.log(res.data.result)
+              let attentionList = []
+              res.data.result.forEach(item => {
+                attentionList.push(item.focusedId)
+              })
+              this.attentionList = attentionList
+              // console.log(this.attentionList)
+            }
+          })
+      },
+      //获取文章点赞数量
+      getPraiseNum(){
+        this.data.forEach(item => {
+          let id = item.id
+          axios.post('articles/num',{
+            id:id,
+          })
+            .then((res) => {
+              if(res.data.status === '200'){
+                // console.log(res.data.result)
+               this.$set(item,'num',res.data.result)
+                // item.num = res.data.result
+              }
+            })
+        })
+
+      },
+      //获取文章收藏数量
+      getCollectionNum(){
+        this.data.forEach(item => {
+          let id = item.id
+          axios.post('articles/cNum',{
+            id:id,
+          })
+            .then((res) => {
+              if(res.data.status === '200'){
+                // console.log(res.data.result)
+                this.$set(item,'cnum',res.data.result)
+                // item.num = res.data.result
+              }
+            })
+        })
+
+      },
       goDetail(){
         this.$router.push('/adoption_shop')
       },
@@ -151,6 +296,8 @@
       },
       getlist(){
         this.data = JSON.parse(JSON.stringify(this.Lists))
+        this.getPraiseNum()
+        this.getCollectionNum()
         // console.log(this.data)
       },
 
