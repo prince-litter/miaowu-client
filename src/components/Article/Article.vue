@@ -1,11 +1,14 @@
 <template>
   <div>
     <div class="blog_dynamic">
-      <div class="blog-year">
+      <div v-if="data.length === 0"  class="nothing">
+        <img src="./images/nothing.png" alt="">
+        <div class="noData">暂无数据...</div>
+      </div>
+      <div v-if="data.length>0" class="blog-year">
         2021年
       </div>
-      <div class="art-container"  v-for="(item1,index1) in data">
-        <slot name="state"></slot>
+      <div v-if="data.length>0" class="art-container"  v-for="(item1,index1) in data">
         <section class="left">
           <div class="day">{{formatDay(item1.time)}}</div>
           <div class="month">{{new Date(item1.time).getMonth() + 1}}月</div>
@@ -106,6 +109,14 @@
   .blog_dynamic
     height 400px
     padding 0 20px
+    .nothing
+      text-align center
+      img
+        width 64px
+        margin 50px auto 5px
+      .noData
+        color #fff
+
     .blog-year
       font-size 25px
       color white

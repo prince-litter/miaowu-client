@@ -16,6 +16,7 @@
 <script>
   import Scroll from '../../components/Scroll/Scroll'
   import AdoptionList from '../../components/AdoptionList/AdoptionList'
+  import {Toast} from 'vant'
   import axios from 'axios'
   export default {
     data(){
@@ -48,6 +49,10 @@
             })
         })
         promise.then(() => {
+          if(result.length === 0){
+            Toast('暂无数据')
+            return
+          }
           this.Lists = result
         })
 

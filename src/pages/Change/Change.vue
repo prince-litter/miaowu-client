@@ -17,20 +17,20 @@
 
 		</div>
 		<van-cell-group>
-			<van-cell title="用户名" value="" is-link :label="covername" @click='changename()' />
+			<van-cell title="用户名" value="" is-link :label="covername" @click='showname = true' />
 			<van-popup v-model="showname" :style="{ width:'90%' }" closeable round>
 				<div class="buttom">
 					<p>请输入新用户名</p>
 					<br />
 					<input type="text" class="insert" name="text" v-model="covername" />
 
-					<button class="send" @click="changename()">确定</button>
+					<button class="send" @click="changename">确定</button>
 
 				</div>
 			</van-popup>
 
 
-			<van-cell title="修改密码" value="去修改 " is-link label="" @click='changepass()' />
+			<van-cell title="修改密码" value="去修改 " is-link label="" @click='showmima = true' />
 			<van-popup v-model="showmima" :style="{ width:'90%'}" click-overlay="qingkong" closeable round>
 				<div class="buttom1">
 					<br />
@@ -40,7 +40,7 @@
 					<input type="password" class="insert" name="text" v-model="newpass" />
 					<p>确认新密码</p>
 					<input type="password" class="insert" name="text" v-model="newpass1" />
-					<button class="send" @click='changemima()'>确定</button>
+					<button class="send" @click='changemima'>确定</button>
 				</div>
 			</van-popup>
 		</van-cell-group>
@@ -104,7 +104,6 @@
 		methods: {
 
 			changename() {
-				this.showname = true
         this.changeData(this.covername,'userName')
         localStorage.setItem('userName',this.covername)
 			},
@@ -205,7 +204,7 @@
               this.showname = false
             }
             if(res.data.status === '300'){
-              this.showmima = true
+              this.showname = true
               Toast('用户名已存在')
 
             }

@@ -13,7 +13,7 @@
         <div class="adoptionShopBlog-content">
           <div class="blog_head">
             <a href="javascript:;" class="head_box">
-              <img :src="'http://localhost:3000/public/images/user\\' + $route.query.imgUrl" alt="">
+              <img :src="'http://localhost:3000\\' + $route.query.imgUrl" alt="">
               <p class="head_name">{{$route.query.name}}</p>
               <!--        <p class="head_address">北京一环路</p>-->
             </a>
@@ -149,7 +149,7 @@
           .then((res)=>{
             if(res.data.status === '200'){
                 let result = res.data.result
-                let time = new Date(result[0].time).getFullYear()
+                // let time = new Date(result[0].time).getFullYear()
                 this.list = JSON.parse(JSON.stringify(result))
                 // console.log(result)
             }

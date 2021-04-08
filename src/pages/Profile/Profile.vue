@@ -181,7 +181,7 @@
           .then((res)=>{
             if(res.data.status === '200'){
               let result = res.data.result
-              let time = new Date(result[0].time).getFullYear()
+              // let time = new Date(result[0].time).getFullYear()
               this.list = JSON.parse(JSON.stringify(result))
               // console.log(result)
             }

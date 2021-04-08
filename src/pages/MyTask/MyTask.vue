@@ -63,7 +63,10 @@
           .then((res)=>{
             if(res.data.status === '200'){
               let result = res.data.result
-              let time = new Date(result[0].time).getFullYear()
+              if(result.length === 0){
+                Toast('暂无数据')
+                return
+              }
               this.list = JSON.parse(JSON.stringify(result))
               console.log(result)
             }
