@@ -225,6 +225,11 @@
 
   .inputimg
     margin: 5px 20px;
+    .van-uploader__upload
+      input
+        width 100%
+        margin 0
+        height 100%
   .botttom
     .li
       width 95%

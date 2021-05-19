@@ -14,7 +14,7 @@
       </a>
 
     </header>
-    <Scroll class="medic-wrapper">
+    <Scroll class="medic-wrapper" ref="scroll" :data="storeList">
       <div class="content-container">
         <div class="medic_content">
           <div class="medic_nav">
@@ -47,7 +47,7 @@
           <div class="shop_header">
             <span>宠物医院</span>
           </div>
-          <MedicList/>
+          <MedicList @reScroll="reScroll"/>
         </div>
       </div>
     </Scroll>
@@ -60,7 +60,7 @@ import Scroll from '../../components/Scroll/Scroll'
   export default {
     data(){
       return{
-
+        storeList:[]
       }
     },
     mounted() {
@@ -144,6 +144,11 @@ import Scroll from '../../components/Scroll/Scroll'
     components:{
         MedicList,
         Scroll
+    },
+    methods:{
+      reScroll(storeList){
+        this.storeList = storeList
+      }
     }
   }
 

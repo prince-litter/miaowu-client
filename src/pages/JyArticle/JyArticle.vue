@@ -6,7 +6,7 @@
       </a>
       <div>寄养专区</div>
     </div>
-    <Scroll class="jy-wrapper">
+    <Scroll class="jy-wrapper" :data="Lists">
       <div>
         <div id="jy-txt">— 宠物分类 —</div>
         <div class="jy-nav">

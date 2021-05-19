@@ -6,7 +6,7 @@
         </a>
         <div>领养专区</div>
       </div>
-     <Scroll class="ly-wrapper">
+     <Scroll class="ly-wrapper" :data="Lists">
        <div>
          <div id="ly-txt">— 宠物分类 —</div>
          <div class="ly-nav">

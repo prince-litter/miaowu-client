@@ -71,7 +71,7 @@
        */
       refreshDelay: {
         type: Number,
-        default: 20
+        default: 50
       },
       // 控制开关滚动到底部
       scrollToEndFlag: {
@@ -91,7 +91,7 @@
           }
 
         })
-      }, 50)
+      }, 100)
       setTimeout(() =>{
         if(this.scrollToEndFlag){
           this.$nextTick(() => {
@@ -205,6 +205,7 @@
         immediate:true,
         deep:true
       }
+
     }
   }
 

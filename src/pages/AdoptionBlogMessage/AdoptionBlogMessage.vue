@@ -142,8 +142,9 @@
           setTimeout(()=>{
             this.$nextTick(() => {
               this.$refs.scroll.ScrollToEndFlag();
+              this.$refs.scroll.refresh()
             })
-          },50)
+          },100)
 
         },
         immediate:true,

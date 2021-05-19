@@ -46,6 +46,15 @@
 
         }
       })
+    },
+    watch:{
+      storeList:{
+        handler () {
+         this.$emit("reScroll",this.storeList)
+        },
+        immediate:true,
+        deep:true
+      }
     }
   }
 
